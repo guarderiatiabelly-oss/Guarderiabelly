@@ -1,0 +1,1511 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema Administrativo — Guardería</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Poppins',sans-serif}
+:root{
+  --teal:#2a9d8f;--teal-dark:#1d7a6e;--teal-light:#e0f5f3;
+  --orange:#e76f1a;--orange-light:#fff3ea;
+  --euro:#3a5fc8;--euro-light:#eef1fc;
+  --cream:#f7f9f8;--border:#d4e8e5;
+  --text:#1a3c38;--text2:#4a7a74;--text3:#8ab5af;
+  --red:#e53935;--red-light:#fdecea;
+  --purple:#7c3aed;--purple-light:#ede9fe;
+  --green:#059669;--green-light:#d1fae5;
+  --shadow:0 2px 10px rgba(42,157,143,0.13);
+}
+body{background:var(--teal-dark);min-height:100vh}
+.app{display:flex;flex-direction:column;min-height:100vh}
+.topbar{background:var(--teal-dark);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-icon{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:22px}
+.brand-title{font-size:15px;font-weight:700;color:#fff}
+.brand-sub{font-size:10px;color:rgba(255,255,255,.7)}
+.topbar-right{display:flex;align-items:center;gap:8px}
+.btn-exp{background:var(--orange);border:none;border-radius:20px;padding:7px 16px;font-size:11px;font-weight:600;color:#fff;cursor:pointer}
+.btn-exp:hover{opacity:.88}
+.save-ind{font-size:9px;color:rgba(255,255,255,.6);padding:4px 10px;border-radius:20px;background:rgba(255,255,255,.1)}
+.db-status{font-size:9px;font-weight:600;padding:4px 10px;border-radius:20px}
+.db-status.ok{background:rgba(42,255,150,.15);color:#4fffaa}
+.db-status.err{background:rgba(255,80,80,.15);color:#ff8080}
+.db-status.load{background:rgba(255,200,0,.15);color:#ffd040}
+.tasas-bar{background:rgba(0,0,0,.2);padding:8px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;position:sticky;top:64px;z-index:49}
+.ti{display:flex;align-items:center;gap:7px}
+.ti label{font-size:9px;font-weight:700;color:rgba(255,255,255,.65);text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
+.ti input{width:90px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:8px;padding:5px 8px;font-size:13px;font-weight:700;color:#fff;font-family:'Poppins',sans-serif;outline:none;text-align:center}
+.ti input:focus{border-color:rgba(255,255,255,.6);background:rgba(255,255,255,.18)}
+.tb{font-size:9px;font-weight:700;padding:3px 9px;border-radius:20px;color:#fff;letter-spacing:.3px}
+.tb.u{background:var(--teal)}.tb.e{background:var(--euro)}
+.tsep{color:rgba(255,255,255,.2);font-size:20px}
+.tasa-hint{font-size:9px;color:rgba(255,255,255,.4);font-style:italic}
+.tabs{display:flex;background:rgba(0,0,0,.15);border-bottom:2px solid rgba(255,255,255,.08);overflow-x:auto;position:sticky;top:113px;z-index:40}
+.tab{padding:10px 13px;font-size:11px;font-weight:600;color:rgba(255,255,255,.5);border:none;background:none;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap;font-family:'Poppins',sans-serif;transition:all .15s}
+.tab.active{color:#fff;border-bottom-color:var(--orange);background:rgba(255,255,255,.06)}
+.tab:hover:not(.active){color:rgba(255,255,255,.85)}
+.content{flex:1;padding:16px;background:var(--cream)}
+.section{display:none}.section.active{display:block}
+.sec-title{font-size:14px;font-weight:700;color:var(--teal-dark)}
+.sac{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.cards-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:16px}
+.card{border-radius:14px;padding:13px 15px;box-shadow:var(--shadow)}
+.card.teal{background:var(--teal);color:#fff}
+.card.orange{background:var(--orange);color:#fff}
+.card.dark{background:var(--teal-dark);color:#fff}
+.card.euro{background:var(--euro);color:#fff}
+.card.white{background:#fff;border:1px solid var(--border);color:var(--text)}
+.card-label{font-size:9px;font-weight:700;opacity:.75;margin-bottom:4px;text-transform:uppercase;letter-spacing:.6px}
+.card-val{font-size:18px;font-weight:700}
+.card-sub{font-size:9px;opacity:.6;margin-top:2px}
+.panel{background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:14px;box-shadow:var(--shadow)}
+.panel-head{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;background:var(--teal-dark)}
+.panel-head h3{font-size:12px;font-weight:700;color:#fff}
+.btn{padding:7px 14px;font-size:11px;font-weight:600;border-radius:20px;border:none;background:var(--teal);color:#fff;cursor:pointer;font-family:'Poppins',sans-serif;transition:all .15s}
+.btn:hover{opacity:.88}
+.btn.orange{background:var(--orange)}
+.btn.outline{background:transparent;border:1.5px solid var(--teal);color:var(--teal)}
+.btn.outline:hover{background:var(--teal-light)}
+.btn.ghost{background:transparent;color:var(--text2);border:1.5px solid var(--border)}
+.btn.ghost:hover{background:var(--teal-light)}
+.btn.danger{background:transparent;color:var(--red);border:1.5px solid #fca5a5}
+.btn.danger:hover{background:var(--red-light)}
+.btn.sm{padding:5px 11px;font-size:10px}
+.btn.xs{padding:3px 8px;font-size:9px}
+table{width:100%;border-collapse:collapse;font-size:11px}
+th{text-align:left;padding:9px 12px;font-size:9px;font-weight:700;color:#fff;background:var(--teal-dark);text-transform:uppercase;letter-spacing:.6px}
+td{padding:7px 12px;border-bottom:1px solid var(--border);color:var(--text);font-size:11px;vertical-align:top}
+td strong{font-weight:600}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--teal-light)}
+.td-ac{display:flex;gap:4px;align-items:center;flex-wrap:wrap}
+.badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:9px;font-weight:600}
+.badge.teal{background:var(--teal-light);color:var(--teal-dark)}
+.badge.orange{background:var(--orange-light);color:var(--orange)}
+.badge.euro{background:var(--euro-light);color:var(--euro)}
+.badge.red{background:var(--red-light);color:var(--red)}
+.badge.gray{background:#f0f0f0;color:#666}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.form-row.triple{grid-template-columns:1fr 1fr 1fr}
+.form-row.single{grid-template-columns:1fr}
+.form-group{display:flex;flex-direction:column;gap:4px}
+.form-group label{font-size:9px;font-weight:700;color:var(--teal-dark);text-transform:uppercase;letter-spacing:.5px}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:8px 11px;font-size:12px;font-family:'Poppins',sans-serif;border:1.5px solid var(--border);border-radius:9px;background:#fff;color:var(--text);outline:none;font-weight:500}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(42,157,143,.08)}
+.form-group textarea{resize:vertical;min-height:65px;line-height:1.5}
+.conv-box{background:var(--teal-light);border:1.5px solid var(--teal);border-radius:12px;padding:13px 14px;margin-bottom:12px}
+.conv-title{font-size:9px;font-weight:700;color:var(--teal-dark);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+.conv-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.conv-field{display:flex;flex-direction:column;gap:4px}
+.conv-field .clabel{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+.clabel.lbs{color:var(--teal-dark)}.clabel.lusdt{color:#059669}.clabel.leur{color:var(--euro)}
+.conv-field input{padding:9px 10px;border-radius:8px;font-size:13px;font-weight:700;font-family:'Poppins',sans-serif;border:1.5px solid;outline:none;width:100%}
+.ibs{border-color:var(--teal);background:#fff;color:var(--teal-dark)}
+.iusdt{border-color:#059669;background:#f0fdf4;color:#065f46}
+.ieur{border-color:var(--euro);background:var(--euro-light);color:var(--euro)}
+.conv-hint{font-size:9px;color:var(--text2);margin-top:9px;font-style:italic;padding:5px 8px;background:rgba(42,157,143,.08);border-radius:6px}
+.info-box{background:var(--euro-light);border:1.5px solid var(--euro);border-radius:10px;padding:10px 13px;margin-bottom:12px;font-size:11px;color:var(--euro)}
+.info-box strong{font-weight:700}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(15,40,36,.6);z-index:300;align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto}
+.modal-bg.open{display:flex}
+.modal{background:#fff;border-radius:18px;width:100%;max-width:580px;box-shadow:0 20px 60px rgba(0,0,0,.28);margin:auto}
+.modal-head{background:var(--teal-dark);padding:15px 20px;border-radius:18px 18px 0 0;display:flex;align-items:center;justify-content:space-between}
+.modal-head h2{font-size:14px;font-weight:700;color:#fff}
+.close-btn{background:rgba(255,255,255,.15);border:none;color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center}
+.close-btn:hover{background:rgba(255,255,255,.3)}
+.modal-body{padding:18px}
+.modal-foot{display:flex;justify-content:flex-end;gap:8px;padding:13px 18px;border-top:1px solid var(--border);background:#fafafa;border-radius:0 0 18px 18px}
+.asiento{background:#fff;border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden}
+.a-head{background:var(--teal-dark);padding:8px 14px;display:flex;justify-content:space-between;align-items:center}
+.a-head span{font-size:11px;font-weight:700;color:#fff}
+.a-line{display:flex;justify-content:space-between;align-items:flex-start;padding:8px 14px;border-bottom:1px solid var(--border);font-size:11px;color:var(--text);gap:10px}
+.a-line:last-child{border-bottom:none}
+.a-line.total{background:var(--teal-light);font-weight:700;font-size:12px;color:var(--teal-dark)}
+.a-desc{font-size:9px;color:var(--text3);margin-top:2px;font-style:italic;line-height:1.4}
+.pcard{background:#fff;border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden}
+.p-head{padding:11px 15px;display:flex;justify-content:space-between;align-items:center}
+.p-head h4{font-size:12px;font-weight:700;color:#fff}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.d-row{display:flex;justify-content:space-between;align-items:center;padding:9px 15px;border-bottom:1px solid var(--border)}
+.d-row:last-child{border-bottom:none}
+.flt{font-size:11px;font-weight:500;font-family:'Poppins',sans-serif;padding:7px 12px;border:1.5px solid var(--border);border-radius:20px;background:#fff;color:var(--text);outline:none}
+.pos{color:#065f46;font-weight:700}.neg{color:var(--red);font-weight:700}.ecol{color:var(--euro);font-weight:600}
+.empty{text-align:center;padding:28px;color:var(--text3);font-size:11px;font-weight:500}
+/* ── BALANCE CONTABLE ── */
+.bal-section{background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:14px;box-shadow:var(--shadow)}
+.bal-section-head{padding:11px 16px;display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:700;color:#fff}
+.bal-section-head.activo{background:#0d9488}
+.bal-section-head.pasivo{background:#e53935}
+.bal-section-head.capital{background:#7c3aed}
+.bal-row{display:flex;justify-content:space-between;align-items:center;padding:9px 16px;border-bottom:1px solid var(--border);font-size:11px;color:var(--text);gap:10px}
+.bal-row:last-child{border-bottom:none}
+.bal-row.subtotal{background:var(--teal-light);font-weight:700;font-size:12px;color:var(--teal-dark)}
+.bal-row.grand{background:var(--teal-dark);color:#fff;font-weight:700;font-size:12px}
+.bal-form-head{padding:11px 16px;display:flex;justify-content:space-between;align-items:center}
+.bal-tab{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.bal-tab button{padding:7px 14px;font-size:11px;font-weight:600;border-radius:20px;border:2px solid;background:transparent;cursor:pointer;font-family:'Poppins',sans-serif;transition:all .15s}
+.bal-tab button.act-a{border-color:#0d9488;color:#0d9488;background:#e0f5f3}
+.bal-tab button.act-p{border-color:#e53935;color:#e53935;background:#fdecea}
+.bal-tab button.act-k{border-color:#7c3aed;color:#7c3aed;background:#ede9fe}
+.bal-tab button.act-i{border-color:#059669;color:#059669;background:#d1fae5}
+.bal-tab button.act-e{border-color:#e76f1a;color:#e76f1a;background:#fff3ea}
+.bal-tab button.inact{border-color:var(--border);color:var(--text2)}
+.bal-tag{display:inline-block;padding:2px 9px;border-radius:20px;font-size:9px;font-weight:700}
+.bal-tag.a{background:#e0f5f3;color:#0d9488}
+.bal-tag.p{background:#fdecea;color:#e53935}
+.bal-tag.k{background:#ede9fe;color:#7c3aed}
+.bal-tag.i{background:#d1fae5;color:#059669}
+.bal-tag.e{background:#fff3ea;color:#e76f1a}
+.ec-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:16px}
+.ec-card{border-radius:12px;padding:12px 14px;border:2px solid}
+.ec-card.a{background:#e0f5f3;border-color:#0d9488}
+.ec-card.p{background:#fdecea;border-color:#e53935}
+.ec-card.k{background:#ede9fe;border-color:#7c3aed}
+.ec-card.i{background:#d1fae5;border-color:#059669}
+.ec-card.e{background:#fff3ea;border-color:#e76f1a}
+.ec-card-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;opacity:.75;margin-bottom:4px}
+.ec-card-val{font-size:16px;font-weight:700}
+.ec-card.a .ec-card-lbl,.ec-card.a .ec-card-val{color:#0d9488}
+.ec-card.p .ec-card-lbl,.ec-card.p .ec-card-val{color:#e53935}
+.ec-card.k .ec-card-lbl,.ec-card.k .ec-card-val{color:#7c3aed}
+.ec-card.i .ec-card-lbl,.ec-card.i .ec-card-val{color:#059669}
+.ec-card.e .ec-card-lbl,.ec-card.e .ec-card-val{color:#e76f1a}
+@media(max-width:620px){
+  .form-row,.form-row.triple,.conv-grid,.two-col{grid-template-columns:1fr}
+  .tab{padding:8px 10px;font-size:10px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-icon">🏫</div>
+    <div><div class="brand-title">Sistema Administrativo</div><div class="brand-sub">Guardería TiaBelly</div></div>
+  </div>
+  <div class="topbar-right">
+    <span class="db-status load" id="db-status">⏳ Conectando...</span>
+    <span class="save-ind" id="save-ind" style="display:none"></span>
+    <button class="btn-exp" onclick="exportar()">⬇ Exportar</button>
+  </div>
+</div>
+<div class="tasas-bar">
+  <span style="font-size:10px;font-weight:700;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.5px">Tasas del día:</span>
+  <div class="ti"><span class="tb u">USDT</span><label>Bs por 1 $</label><input type="number" id="tu" placeholder="Ej: 40.00" step="0.01" oninput="saveTasas()"></div>
+  <div class="tsep">|</div>
+  <div class="ti"><span class="tb e">EUR</span><label>Bs por 1 €</label><input type="number" id="te" placeholder="Ej: 44.00" step="0.01" oninput="saveTasas()"></div>
+  <span class="tasa-hint">Actualiza cada día antes de registrar movimientos</span>
+</div>
+<div class="tabs">
+  <button class="tab active" onclick="showTab('dashboard',this)">🏠 Inicio</button>
+  <button class="tab" onclick="showTab('ninos',this)">👶 Beneficiarios</button>
+  <button class="tab" onclick="showTab('ingresos',this)">💰 Ingresos</button>
+  <button class="tab" onclick="showTab('egresos',this)">📤 Egresos</button>
+  <button class="tab" onclick="showTab('personal',this)">👩‍🏫 Personal</button>
+  <button class="tab" onclick="showTab('partidas',this)">📂 Partidas</button>
+  <button class="tab" onclick="showTab('reportes',this)">📊 Reportes</button>
+</div>
+<div class="content">
+<div class="section active" id="sec-dashboard">
+  <div class="cards-row" id="cards-resumen"></div>
+  <div class="two-col">
+    <div class="panel"><div class="panel-head"><h3>🔔 Cobros del período</h3></div><div id="pend-list"><div class="empty">Cargando...</div></div></div>
+    <div class="panel"><div class="panel-head"><h3>🕐 Últimos movimientos</h3></div><div id="ult-list"><div class="empty">Cargando...</div></div></div>
+  </div>
+</div>
+<div class="section" id="sec-ninos">
+  <div class="sac"><span class="sec-title">Registro de beneficiarios</span><button class="btn" onclick="openN()">+ Registrar niño</button></div>
+  <div class="panel" style="overflow-x:auto">
+    <table><thead><tr><th>Beneficiario</th><th>Tutor</th><th>Servicio</th><th>Tarifa EUR</th><th>Equiv. Bs</th><th>Equiv. USDT</th><th>Frecuencia</th><th>Acciones</th></tr></thead>
+    <tbody id="tb-ninos"><tr><td colspan="8" class="empty">Cargando...</td></tr></tbody></table>
+  </div>
+</div>
+<div class="section" id="sec-ingresos">
+  <div class="sac"><span class="sec-title">Ingresos operativos</span><button class="btn" onclick="openI()">+ Registrar ingreso</button></div>
+  <div class="info-box">💡 <strong>Flujo de cobro:</strong> La tarifa está pactada en EUR. El cliente paga en Bs. Ingresa los Bs recibidos → el sistema calcula automáticamente USDT y EUR.</div>
+  <div class="panel" style="overflow-x:auto">
+    <table><thead><tr><th>Fecha</th><th>Beneficiario</th><th>Partida</th><th>Tipo de cuenta</th><th>Bs recibidos</th><th>USDT</th><th>EUR</th><th>Método</th><th>Acciones</th></tr></thead>
+    <tbody id="tb-ingresos"><tr><td colspan="9" class="empty">Cargando...</td></tr></tbody></table>
+  </div>
+</div>
+<div class="section" id="sec-egresos">
+  <div class="sac"><span class="sec-title">Egresos operativos</span><button class="btn" onclick="openE()">+ Registrar egreso</button></div>
+  <div class="panel" style="overflow-x:auto">
+    <table><thead><tr><th>Fecha</th><th>Concepto</th><th>Beneficiario</th><th>Partida</th><th>Bs pagados</th><th>USDT</th><th>EUR</th><th>Tasa $</th><th>Acciones</th></tr></thead>
+    <tbody id="tb-egresos"><tr><td colspan="9" class="empty">Cargando...</td></tr></tbody></table>
+  </div>
+</div>
+<div class="section" id="sec-personal">
+  <div class="sac"><span class="sec-title">Gestión de nómina</span><button class="btn" onclick="openP()">+ Agregar personal</button></div>
+  <div class="panel" style="overflow-x:auto">
+    <table><thead><tr><th>Empleado</th><th>Cargo</th><th>Salario Bs</th><th>USDT</th><th>EUR</th><th>Frecuencia</th><th>Último pago</th><th>Acciones</th></tr></thead>
+    <tbody id="tb-personal"><tr><td colspan="8" class="empty">Cargando...</td></tr></tbody></table>
+  </div>
+</div>
+<div class="section" id="sec-partidas">
+  <div class="sac"><span class="sec-title">Catálogo de partidas contables</span><button class="btn" onclick="openPA()">+ Nueva partida</button></div>
+  <div id="lista-partidas"></div>
+</div>
+<!-- ══ SECCIÓN REPORTES ══ -->
+<div class="section" id="sec-reportes">
+
+  <!-- Header -->
+  <div style="margin-bottom:20px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px">
+      <div>
+        <h2 style="font-size:20px;font-weight:700;color:var(--teal-dark);margin:0 0 4px">📊 Reportes e Informes Financieros</h2>
+        <p style="font-size:11px;color:var(--text2);margin:0">Estado financiero — Guardería Tía Belly</p>
+      </div>
+      <button class="btn outline sm" onclick="exportarReporte()">💾 Exportar CSV</button>
+    </div>
+  </div>
+
+  <!-- Período de análisis -->
+  <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:20px;box-shadow:var(--shadow)">
+    <div style="font-size:10px;font-weight:700;color:var(--teal-dark);text-transform:uppercase;letter-spacing:.7px;margin-bottom:12px">📅 Período de análisis</div>
+    <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end">
+      <div class="form-group" style="margin:0"><label>Fecha inicio</label><input id="rep-ini" type="date" class="flt"></div>
+      <div class="form-group" style="margin:0"><label>Fecha fin</label><input id="rep-fin" type="date" class="flt"></div>
+      <div class="form-group" style="margin:0"><label>Período rápido</label>
+        <select id="rep-rapido" class="flt" onchange="setRepRapido()">
+          <option value="">Personalizado</option>
+          <option value="hoy">Hoy</option>
+          <option value="sem">Esta semana</option>
+          <option value="mes">Este mes</option>
+          <option value="trim">Este trimestre</option>
+          <option value="year">Este año</option>
+          <option value="todo">Todo el período</option>
+        </select>
+      </div>
+      <button class="btn" onclick="renderReportes()">🔄 Actualizar</button>
+    </div>
+  </div>
+
+  <!-- Tabla Estado de Resultados estilo Cycle -->
+  <div style="background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:20px;box-shadow:var(--shadow)">
+    <div style="background:var(--teal-dark);padding:12px 18px;display:flex;justify-content:space-between;align-items:center">
+      <span style="color:#fff;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.7px">📋 Estado de Resultados (Ganancias y Pérdidas)</span>
+    </div>
+    <table style="width:100%;border-collapse:collapse">
+      <thead>
+        <tr style="background:#f0f4f8">
+          <th style="text-align:left;padding:10px 18px;font-size:11px;font-weight:700;color:#1a3a5c;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid var(--border)">Concepto</th>
+          <th style="text-align:right;padding:10px 18px;font-size:11px;font-weight:700;color:#1a3a5c;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid var(--border)">Bolívares (Bs.)</th>
+          <th style="text-align:right;padding:10px 18px;font-size:11px;font-weight:700;color:#1a3a5c;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid var(--border)">USDT</th>
+          <th style="text-align:right;padding:10px 18px;font-size:11px;font-weight:700;color:#1a3a5c;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid var(--border)">EUR</th>
+        </tr>
+      </thead>
+      <tbody id="tb-rep-resultados"></tbody>
+    </table>
+  </div>
+
+  <!-- Resumen ejecutivo cards -->
+  <div id="rep-resumen" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px"></div>
+
+</div>
+</div>
+</div>
+
+<!-- MODAL NIÑO -->
+<div class="modal-bg" id="modal-n">
+  <div class="modal">
+    <div class="modal-head"><h2 id="mn-t">Registrar beneficiario</h2><button class="close-btn" onclick="cm('modal-n')">✕</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="n-id">
+      <div class="form-row">
+        <div class="form-group"><label>Nombre del niño *</label><input id="n-nombre" type="text" placeholder="Nombre completo"></div>
+        <div class="form-group"><label>Tutor / Representante</label><input id="n-tutor" type="text" placeholder="Nombre del representante"></div>
+      </div>
+      <div class="form-row triple">
+        <div class="form-group"><label>Servicio</label><select id="n-serv"><option>Guardería</option><option>Tareas dirigidas</option><option>Guardería + Tareas</option></select></div>
+        <div class="form-group"><label>Frecuencia de pago</label><select id="n-freq"><option>Semanal</option><option>Quincenal</option><option>Mensual</option></select></div>
+        <div class="form-group"><label>Teléfono tutor</label><input id="n-tel" type="text" placeholder="0412-..."></div>
+      </div>
+      <div class="conv-box">
+        <div class="conv-title">💱 Tarifa acordada — pactada en EUR</div>
+        <div class="conv-grid">
+          <div class="conv-field"><span class="clabel lbs">Tarifa en Bs</span><input class="ibs" id="n-bs" type="number" placeholder="0.00" oninput="cd('n','bs')"></div>
+          <div class="conv-field"><span class="clabel lusdt">Tarifa en USDT ($)</span><input class="iusdt" id="n-usdt" type="number" placeholder="0.00" oninput="cd('n','usdt')"></div>
+          <div class="conv-field"><span class="clabel leur">Tarifa en EUR (€) ★</span><input class="ieur" id="n-eur" type="number" placeholder="0.00" oninput="cd('n','eur')"></div>
+        </div>
+        <div class="conv-hint" id="hn">💡 Ingresa la tarifa en EUR. Las tasas del día calculan Bs y USDT.</div>
+      </div>
+      <div class="form-row single"><div class="form-group"><label>Observaciones</label><textarea id="n-desc" placeholder="Alergias, horario especial, notas médicas..."></textarea></div></div>
+    </div>
+    <div class="modal-foot"><button class="btn ghost" onclick="cm('modal-n')">Cancelar</button><button class="btn" onclick="gN()">Guardar</button></div>
+  </div>
+</div>
+
+<!-- MODAL INGRESO -->
+<div class="modal-bg" id="modal-i">
+  <div class="modal">
+    <div class="modal-head"><h2 id="mi-t">Registrar ingreso</h2><button class="close-btn" onclick="cm('modal-i')">✕</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="i-id">
+      <div class="form-row">
+        <div class="form-group"><label>Fecha *</label><input id="i-fecha" type="date"></div>
+        <div class="form-group"><label>Beneficiario</label><select id="i-nino"><option value="">— General —</option></select></div>
+      </div>
+      <div class="form-row single">
+        <div class="form-group"><label>Partida contable</label><select id="i-partida"><option value="">— Seleccionar —</option></select></div>
+      </div>
+      <div class="conv-box">
+        <div class="conv-title">💱 Flujo de cobro — Pactado en EUR, cobrado en Bs, resguardado en USDT</div>
+        <!-- Paso 1: EUR (base) -->
+        <div style="margin-bottom:10px">
+          <div style="font-size:10px;font-weight:700;color:var(--euro);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">① Tarifa pactada en EUR ★</div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <input class="ieur" id="i-eur" type="number" placeholder="Ej: 10.00" step="0.01"
+              style="flex:1;font-size:15px;font-weight:700;border:2px solid var(--euro)"
+              oninput="iCalcEur()">
+            <span style="font-size:11px;color:var(--text2);flex-shrink:0">€ × tasa EUR (<span id="i-tasa-eur-show">—</span> Bs/€)</span>
+          </div>
+        </div>
+        <!-- Paso 2: Bs cobrados -->
+        <div style="margin-bottom:10px">
+          <div style="font-size:10px;font-weight:700;color:var(--teal-dark);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">② Bs a cobrar al cliente</div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <input class="ibs" id="i-bs" type="number" placeholder="auto" step="0.01"
+              style="flex:1;font-size:15px;font-weight:700;border:2px solid var(--teal)"
+              oninput="iCalcBs()">
+            <span style="font-size:11px;color:var(--text2);flex-shrink:0">Bs ÷ tasa USDT (<span id="i-tasa-usdt-show">—</span> Bs/$)</span>
+          </div>
+        </div>
+        <!-- Paso 3: USDT resultado -->
+        <div style="background:#e0f5f3;border-radius:10px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-size:10px;font-weight:700;color:#065f46;text-transform:uppercase;letter-spacing:.5px">③ Equivalente en USDT (se guarda)</div>
+            <div style="font-size:20px;font-weight:700;color:#065f46;margin-top:3px" id="i-usdt-display">0.00 $</div>
+          </div>
+          <input type="hidden" id="i-usdt">
+        </div>
+        <div class="conv-hint" id="hi" style="margin-top:8px">💡 Ingresa la tarifa en EUR → calcula Bs automático → convierte a USDT para resguardar el valor.</div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Método de pago</label><select id="i-metodo"><option>Pago Móvil</option><option>Transferencia Bs</option><option>Efectivo Bs</option><option>Zelle</option><option>USDT directo</option><option>Transferencia EUR</option></select></div>
+        <div class="form-group"><label>N° Referencia</label><input id="i-ref" type="text" placeholder="Opcional"></div>
+      </div>
+      <div class="form-row single"><div class="form-group"><label>Descripción</label><textarea id="i-desc" placeholder="Detalle adicional..."></textarea></div></div>
+    </div>
+    <div class="modal-foot"><button class="btn ghost" onclick="cm('modal-i')">Cancelar</button><button class="btn" onclick="gI()">Guardar ingreso</button></div>
+  </div>
+</div>
+
+<!-- MODAL EGRESO -->
+<div class="modal-bg" id="modal-e">
+  <div class="modal">
+    <div class="modal-head"><h2 id="me-t">Registrar egreso</h2><button class="close-btn" onclick="cm('modal-e')">✕</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="e-id">
+      <div class="form-row">
+        <div class="form-group"><label>Fecha *</label><input id="e-fecha" type="date"></div>
+        <div class="form-group"><label>Tipo de egreso</label><select id="e-tipo"><option>Nómina</option><option>Servicios públicos</option><option>Materiales y suministros</option><option>Alimentación</option><option>Mantenimiento</option><option>Gastos administrativos</option><option>Otros</option></select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Partida contable</label><select id="e-partida"><option value="">— Seleccionar —</option></select></div>
+        <div class="form-group"><label>Beneficiario / Proveedor</label><input id="e-benef" type="text" placeholder="A quién se realiza el pago"></div>
+      </div>
+      <div class="conv-box">
+        <div class="conv-title">💱 Monto pagado</div>
+        <div class="conv-grid">
+          <div class="conv-field"><span class="clabel lbs">✅ Bs pagados *</span><input class="ibs" id="e-bs" type="number" placeholder="0.00" oninput="cd('e','bs')"></div>
+          <div class="conv-field"><span class="clabel lusdt">= Equiv. USDT</span><input class="iusdt" id="e-usdt" type="number" placeholder="auto" oninput="cd('e','usdt')"></div>
+          <div class="conv-field"><span class="clabel leur">= Equiv. EUR</span><input class="ieur" id="e-eur" type="number" placeholder="auto" oninput="cd('e','eur')"></div>
+        </div>
+        <div class="conv-hint" id="he">Ingresa los Bs pagados → se calculan USDT y EUR.</div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Concepto *</label><input id="e-conc" type="text" placeholder="Descripción breve del gasto"></div>
+        <div class="form-group"><label>N° Referencia</label><input id="e-ref" type="text" placeholder="Opcional"></div>
+      </div>
+      <div class="form-row single"><div class="form-group"><label>Notas</label><textarea id="e-desc" placeholder="Detalles, observaciones..."></textarea></div></div>
+    </div>
+    <div class="modal-foot"><button class="btn ghost" onclick="cm('modal-e')">Cancelar</button><button class="btn orange" onclick="gE()">Guardar egreso</button></div>
+  </div>
+</div>
+
+<!-- MODAL PERSONAL -->
+<div class="modal-bg" id="modal-p">
+  <div class="modal">
+    <div class="modal-head"><h2 id="mp-t">Registrar personal</h2><button class="close-btn" onclick="cm('modal-p')">✕</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="p-id">
+      <div class="form-row">
+        <div class="form-group"><label>Nombre completo *</label><input id="p-nombre" type="text" placeholder="Nombre completo"></div>
+        <div class="form-group"><label>Cargo</label><select id="p-cargo"><option>Maestra titular</option><option>Maestra auxiliar</option><option>Personal de limpieza</option><option>Administrador/a</option><option>Cocinera</option><option>Otro</option></select></div>
+      </div>
+      <div class="conv-box">
+        <div class="conv-title">💱 Salario base</div>
+        <div class="conv-grid">
+          <div class="conv-field"><span class="clabel lbs">Salario en Bs</span><input class="ibs" id="p-bs" type="number" placeholder="0.00" oninput="cd('p','bs')"></div>
+          <div class="conv-field"><span class="clabel lusdt">= Equiv. USDT</span><input class="iusdt" id="p-usdt" type="number" placeholder="auto" oninput="cd('p','usdt')"></div>
+          <div class="conv-field"><span class="clabel leur">= Equiv. EUR</span><input class="ieur" id="p-eur" type="number" placeholder="auto" oninput="cd('p','eur')"></div>
+        </div>
+        <div class="conv-hint" id="hp">Ingresa el salario en Bs para calcular equivalencias.</div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Frecuencia de pago</label><select id="p-freq"><option>Quincenal</option><option>Mensual</option><option>Semanal</option></select></div>
+        <div class="form-group"><label>Teléfono</label><input id="p-tel" type="text" placeholder="0412-..."></div>
+      </div>
+      <div class="form-row single"><div class="form-group"><label>Observaciones</label><textarea id="p-desc" placeholder="Beneficios, horario, condiciones..."></textarea></div></div>
+    </div>
+    <div class="modal-foot"><button class="btn ghost" onclick="cm('modal-p')">Cancelar</button><button class="btn" onclick="gP()">Guardar</button></div>
+  </div>
+</div>
+
+<!-- MODAL PARTIDA -->
+<div class="modal-bg" id="modal-pa">
+  <div class="modal">
+    <div class="modal-head"><h2 id="mpa-t">Nueva partida contable</h2><button class="close-btn" onclick="cm('modal-pa')">✕</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="pa-id">
+      <div class="form-row">
+        <div class="form-group"><label>Código *</label><input id="pa-cod" type="text" placeholder="Ej: 115"></div>
+        <div class="form-group"><label>Tipo *</label><select id="pa-tipo"><option value="Activo">🏦 Activo — Caja, cuentas por cobrar, equipos</option><option value="Pasivo">📉 Pasivo — Deudas, préstamos, cuentas por pagar</option><option value="Capital">💎 Capital — Aportes del dueño, reservas</option><option value="Ingreso">📈 Ingreso</option><option value="Egreso">📤 Egreso</option></select></div>
+      </div>
+      <div class="form-row single"><div class="form-group"><label>Nombre de la partida *</label><input id="pa-nombre" type="text" placeholder="Ej: Ingresos por matrícula"></div></div>
+      <div class="form-row single"><div class="form-group"><label>Descripción</label><textarea id="pa-desc" placeholder="Qué movimientos se registran aquí..."></textarea></div></div>
+      <!-- Saldo inicial -->
+      <div class="conv-box" style="margin-top:4px">
+        <div class="conv-title">💰 Saldo inicial (ingresa el monto en cualquier moneda)</div>
+        <div class="conv-grid">
+          <div class="conv-field">
+            <span class="clabel lbs">Bs</span>
+            <input class="ibs" id="pa-bs" type="number" placeholder="0.00" step="0.01"
+              oninput="paConv('bs')">
+          </div>
+          <div class="conv-field">
+            <span class="clabel lusdt">USDT ($)</span>
+            <input class="iusdt" id="pa-usdt" type="number" placeholder="0.00" step="0.0001"
+              oninput="paConv('usdt')">
+          </div>
+          <div class="conv-field">
+            <span class="clabel leur">EUR (€)</span>
+            <input class="ieur" id="pa-eur" type="number" placeholder="0.00" step="0.0001"
+              oninput="paConv('eur')">
+          </div>
+        </div>
+        <div class="conv-hint" id="pa-hint">Ingresa el saldo inicial en Bs, USDT o EUR — se calculan los equivalentes con las tasas del día.</div>
+      </div>
+    </div>
+    <div class="modal-foot"><button class="btn ghost" onclick="cm('modal-pa')">Cancelar</button><button class="btn" onclick="gPA()">Guardar partida</button></div>
+  </div>
+</div>
+
+<!-- MODAL BALANCE CONTABLE -->
+<div class="modal-bg" id="modal-bal">
+  <div class="modal">
+    <div class="modal-head"><h2 id="mbal-t">Nuevo asiento contable</h2><button class="close-btn" onclick="cm('modal-bal')">✕</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="bal-id">
+      <div class="form-row">
+        <div class="form-group"><label>Fecha *</label><input id="bal-fecha" type="date"></div>
+        <div class="form-group"><label>Tipo contable *</label>
+          <select id="bal-tipo" onchange="onBalTipo()">
+            <option value="activo">Activo</option>
+            <option value="pasivo">Pasivo</option>
+            <option value="capital">Capital</option>
+            <option value="ingreso">Ingreso</option>
+            <option value="egreso">Egreso</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Categoría *</label><input id="bal-cat" type="text" placeholder="Ej: Caja, Deuda, Aporte..."></div>
+        <div class="form-group"><label>Concepto *</label><input id="bal-conc" type="text" placeholder="Descripción del asiento"></div>
+      </div>
+      <div class="conv-box">
+        <div class="conv-title" id="bal-conv-title">💱 Monto</div>
+        <div class="conv-grid">
+          <div class="conv-field"><span class="clabel lbs">Bs *</span><input class="ibs" id="bal-bs" type="number" placeholder="0.00" oninput="cd('bal','bs')"></div>
+          <div class="conv-field"><span class="clabel lusdt">= USDT</span><input class="iusdt" id="bal-usdt" type="number" placeholder="auto" oninput="cd('bal','usdt')"></div>
+          <div class="conv-field"><span class="clabel leur">= EUR</span><input class="ieur" id="bal-eur" type="number" placeholder="auto" oninput="cd('bal','eur')"></div>
+        </div>
+      </div>
+      <div class="form-row single"><div class="form-group"><label>Notas</label><textarea id="bal-notas" placeholder="Observaciones, referencia, detalles..."></textarea></div></div>
+    </div>
+    <div class="modal-foot"><button class="btn ghost" onclick="cm('modal-bal')">Cancelar</button><button class="btn" id="bal-save-btn" onclick="gBal()">Guardar asiento</button></div>
+  </div>
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+import { getFirestore, collection, doc, getDoc, getDocs, setDoc, addDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAYeNm-yaEq77DeWuI8OGIg_t1qY1LPkI8",
+  authDomain: "guarderiatiabelly2026.firebaseapp.com",
+  projectId: "guarderiatiabelly2026",
+  storageBucket: "guarderiatiabelly2026.firebasestorage.app",
+  messagingSenderId: "888215561711",
+  appId: "1:888215561711:web:46759e57b7e38e59e5821a",
+  measurementId: "G-8QWRNB4PR4"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const PTS_DEFAULT=[
+  {c:'110',n:'Servicios de cuidado infantil',t:'Ingreso',d:'Cobros por guardería'},
+  {c:'111',n:'Servicios de apoyo académico',t:'Ingreso',d:'Cobros por tareas dirigidas'},
+  {c:'112',n:'Servicios integrales (guardería + tareas)',t:'Ingreso',d:'Paquete completo'},
+  {c:'113',n:'Otros ingresos operativos',t:'Ingreso',d:'Ingresos varios'},
+  {c:'510',n:'Remuneraciones al personal docente',t:'Egreso',d:'Sueldos y salarios maestras'},
+  {c:'511',n:'Remuneraciones al personal administrativo',t:'Egreso',d:'Personal de apoyo y limpieza'},
+  {c:'520',n:'Servicios públicos',t:'Egreso',d:'Agua, luz, gas, internet'},
+  {c:'530',n:'Materiales y suministros didácticos',t:'Egreso',d:'Material escolar y didáctico'},
+  {c:'531',n:'Materiales de aseo e higiene',t:'Egreso',d:'Productos de limpieza e higiene'},
+  {c:'540',n:'Gastos de alimentación',t:'Egreso',d:'Meriendas y alimentación'},
+  {c:'550',n:'Mantenimiento de instalaciones',t:'Egreso',d:'Reparaciones y mejoras'},
+  {c:'560',n:'Gastos administrativos generales',t:'Egreso',d:'Papelería, gestión, otros'},
+  {c:'570',n:'Otros gastos operativos',t:'Egreso',d:'Gastos varios no clasificados'},
+];
+
+let ninos=[],ing=[],egr=[],per=[],pts=[],balAsientos=[],tU=0,tE=0;
+
+// ── STATUS ──
+function setStatus(msg,tipo){
+  const el=document.getElementById('db-status');
+  el.textContent=msg;el.className='db-status '+tipo;
+}
+function setSave(msg){
+  const el=document.getElementById('save-ind');
+  el.style.display='inline';el.textContent=msg;
+  if(msg==='✓ Guardado')setTimeout(()=>{el.style.display='none'},2500);
+}
+
+// ── FIRESTORE HELPERS ──
+async function fbSet(col,id,data){
+  await setDoc(doc(db,col,id),data);
+}
+async function fbAdd(col,data){
+  const r=await addDoc(collection(db,col),data);return r.id;
+}
+async function fbUpdate(col,id,data){
+  await updateDoc(doc(db,col,id),data);
+}
+async function fbDelete(col,id){
+  await deleteDoc(doc(db,col,id));
+}
+async function fbGetAll(col){
+  const snap=await getDocs(collection(db,col));
+  return snap.docs.map(d=>({...d.data(),_id:d.id}));
+}
+
+// ── CARGAR DATOS ──
+async function loadAll(){
+  try{
+    setStatus('⏳ Conectando...','load');
+    // Tasas
+    const td=await getDoc(doc(db,'config','tasas'));
+    if(td.exists()){tU=td.data().tU||0;tE=td.data().tE||0;}
+    document.getElementById('tu').value=tU||'';
+    document.getElementById('te').value=tE||'';
+
+    // Partidas
+    pts=await fbGetAll('partidas');
+    // Normalizar tipos legacy (por si tienen emoji o texto diferente)
+    const normTipo=t=>{
+      if(!t)return'Ingreso';
+      if(/ingreso/i.test(t))return'Ingreso';
+      if(/egreso/i.test(t))return'Egreso';
+      if(/activo/i.test(t))return'Activo';
+      if(/pasivo/i.test(t))return'Pasivo';
+      if(/capital/i.test(t))return'Capital';
+      return t;
+    };
+    pts=pts.map(p=>({...p,t:normTipo(p.t)}));
+    if(!pts.length){
+      for(const p of PTS_DEFAULT){const id=await fbAdd('partidas',p);pts.push({...p,_id:id});}
+    }
+
+    // Resto
+    ninos=await fbGetAll('ninos');
+    ing=await fbGetAll('ingresos');
+    egr=await fbGetAll('egresos');
+    per=await fbGetAll('personal');
+    balAsientos=await fbGetAll('balance');
+
+    setStatus('🟢 En línea','ok');
+    uh();ra();
+  }catch(e){
+    setStatus('🔴 Error DB','err');
+    console.error(e);
+  }
+}
+
+// ── TASAS ──
+async function saveTasas(){
+  tU=parseFloat(document.getElementById('tu').value)||0;
+  tE=parseFloat(document.getElementById('te').value)||0;
+  try{await fbSet('config','tasas',{tU,tE});uh();}catch(e){console.error(e);}
+}
+window.saveTasas=saveTasas;
+
+// ── FORMATO ──
+function hoy(){return new Date().toISOString().split('T')[0]}
+function fd(s){if(!s)return'—';const[y,m,d]=s.split('-');return`${d}/${m}/${y}`}
+function fBs(n){return'Bs '+parseFloat(n||0).toLocaleString('es-VE',{minimumFractionDigits:2,maximumFractionDigits:2})}
+function fU(n){return parseFloat(n||0).toFixed(2)+' $'}
+function fE(n){return parseFloat(n||0).toFixed(2)+' €'}
+function gNP(c){return(pts.find(p=>p.c===c)||{}).n||c||'—'}
+function gPO(tipo){return pts.filter(p=>!tipo||p.t===tipo).map(p=>`<option value="${p.c}">${p.c} · ${p.n}</option>`).join('')}
+
+function uh(){
+  const ok=tU&&tE;
+  const h=ok?`Tasas activas — USDT: ${tU} Bs/$ · EUR: ${tE} Bs/€`:'⚠ Ingresa las tasas del día antes de registrar';
+  ['hn','hi','he','hp'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=h;});
+  iSyncTasas();
+}
+
+// ── CONVERSIÓN ──
+function cd(pre,desde){
+  const v=parseFloat(document.getElementById(pre+'-'+desde).value)||0;
+  let bs=0,usdt=0,eur=0;
+  if(v>0){
+    if(desde==='bs'){bs=v;usdt=tU?parseFloat((v/tU).toFixed(4)):0;eur=tE?parseFloat((v/tE).toFixed(4)):0;}
+    else if(desde==='usdt'){usdt=v;bs=tU?parseFloat((v*tU).toFixed(2)):0;eur=(bs&&tE)?parseFloat((bs/tE).toFixed(4)):0;}
+    else{eur=v;bs=tE?parseFloat((v*tE).toFixed(2)):0;usdt=(bs&&tU)?parseFloat((bs/tU).toFixed(4)):0;}
+  }
+  if(desde!=='bs')document.getElementById(pre+'-bs').value=bs||'';
+  if(desde!=='usdt')document.getElementById(pre+'-usdt').value=usdt||'';
+  if(desde!=='eur')document.getElementById(pre+'-eur').value=eur||'';
+}
+window.cd=cd;
+function gcv(pre){return{bs:parseFloat(document.getElementById(pre+'-bs').value)||0,usdt:parseFloat(document.getElementById(pre+'-usdt').value)||0,eur:parseFloat(document.getElementById(pre+'-eur').value)||0};}
+function scv(pre,r){document.getElementById(pre+'-bs').value=r.bs||'';document.getElementById(pre+'-usdt').value=r.usdt||'';document.getElementById(pre+'-eur').value=r.eur||'';}
+function clcv(pre){scv(pre,{bs:0,usdt:0,eur:0});}
+
+// ── NAVEGACIÓN ──
+function showTab(id,btn){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.getElementById('sec-'+id).classList.add('active');btn.classList.add('active');ra();}
+window.showTab=showTab;
+function om(id){document.getElementById(id).classList.add('open');document.body.style.overflow='hidden';uh();}
+function cm(id){document.getElementById(id).classList.remove('open');document.body.style.overflow='';}
+window.cm=cm;
+document.querySelectorAll('.modal-bg').forEach(m=>m.addEventListener('click',e=>{if(e.target===m){m.classList.remove('open');document.body.style.overflow=''}}));
+
+// ── NIÑOS ──
+function openN(id=null){
+  document.getElementById('mn-t').textContent=id?'Editar beneficiario':'Registrar beneficiario';
+  document.getElementById('n-id').value=id||'';
+  if(id){const n=ninos.find(x=>x._id===id);document.getElementById('n-nombre').value=n.nombre||'';document.getElementById('n-tutor').value=n.tutor||'';document.getElementById('n-serv').value=n.serv||'Guardería';document.getElementById('n-freq').value=n.freq||'Mensual';document.getElementById('n-tel').value=n.tel||'';scv('n',{bs:n.tBS||0,usdt:n.tU||0,eur:n.tE||0});document.getElementById('n-desc').value=n.desc||'';}
+  else{['n-nombre','n-tutor','n-tel','n-desc'].forEach(x=>document.getElementById(x).value='');clcv('n');}
+  om('modal-n');
+}
+window.openN=openN;
+async function gN(){
+  const nombre=document.getElementById('n-nombre').value.trim();
+  if(!nombre){alert('El nombre es obligatorio');return;}
+  const cv=gcv('n');
+  const obj={nombre,tutor:document.getElementById('n-tutor').value,serv:document.getElementById('n-serv').value,freq:document.getElementById('n-freq').value,tel:document.getElementById('n-tel').value,tBS:cv.bs,tU:cv.usdt,tE:cv.eur,desc:document.getElementById('n-desc').value,activo:true,fi:hoy()};
+  const id=document.getElementById('n-id').value;
+  setSave('Guardando...');
+  try{
+    if(id){await fbUpdate('ninos',id,obj);const i=ninos.findIndex(x=>x._id===id);ninos[i]={...obj,_id:id};}
+    else{const nid=await fbAdd('ninos',obj);ninos.push({...obj,_id:nid});}
+    setSave('✓ Guardado');cm('modal-n');ra();
+  }catch(e){setSave('⚠ Error');console.error(e);}
+}
+window.gN=gN;
+async function delN(id){
+  if(!confirm('¿Eliminar este beneficiario?'))return;
+  setSave('Guardando...');
+  try{await fbDelete('ninos',id);ninos=ninos.filter(x=>x._id!==id);setSave('✓ Guardado');ra();}catch(e){setSave('⚠ Error');}
+}
+window.delN=delN;
+
+// ── FLUJO INGRESO: EUR → Bs → USDT ──
+function iSyncTasas(){
+  const se=document.getElementById('i-tasa-eur-show');
+  const su=document.getElementById('i-tasa-usdt-show');
+  if(se)se.textContent=tE||'—';
+  if(su)su.textContent=tU||'—';
+}
+function iCalcEur(){
+  const eur=parseFloat(document.getElementById('i-eur').value)||0;
+  // EUR × tasa EUR = Bs
+  const bs=tE?parseFloat((eur*tE).toFixed(2)):0;
+  document.getElementById('i-bs').value=bs||'';
+  iCalcUsdt(bs);
+}
+function iCalcBs(){
+  const bs=parseFloat(document.getElementById('i-bs').value)||0;
+  // Si cambian Bs manualmente, recalcular EUR desde Bs
+  const eur=tE?parseFloat((bs/tE).toFixed(4)):0;
+  document.getElementById('i-eur').value=eur||'';
+  iCalcUsdt(bs);
+}
+function iCalcUsdt(bs){
+  const usdt=tU?parseFloat((bs/tU).toFixed(4)):0;
+  document.getElementById('i-usdt').value=usdt||0;
+  const disp=document.getElementById('i-usdt-display');
+  if(disp)disp.textContent=fU(usdt);
+}
+window.iCalcEur=iCalcEur;
+window.iCalcBs=iCalcBs;
+function openI(id=null){
+  document.getElementById('mi-t').textContent=id?'Editar ingreso':'Registrar ingreso';
+  document.getElementById('i-id').value=id||'';
+  const sel=document.getElementById('i-nino');
+  sel.innerHTML='<option value="">— General —</option>'+ninos.map(n=>`<option value="${n._id}">${n.nombre}</option>`).join('');
+  document.getElementById('i-partida').innerHTML='<option value="">— Seleccionar —</option>'+gPO('Ingreso');
+  iSyncTasas();
+  if(id){
+    const r=ing.find(x=>x._id===id);
+    document.getElementById('i-fecha').value=r.fecha||hoy();
+    document.getElementById('i-nino').value=r.niId||'';
+    document.getElementById('i-partida').value=r.pt||'';
+    document.getElementById('i-eur').value=r.eur||'';
+    document.getElementById('i-bs').value=r.bs||'';
+    document.getElementById('i-usdt').value=r.usdt||0;
+    const disp=document.getElementById('i-usdt-display');
+    if(disp)disp.textContent=fU(r.usdt||0);
+    document.getElementById('i-metodo').value=r.met||'Pago Móvil';
+    document.getElementById('i-ref').value=r.ref||'';
+    document.getElementById('i-desc').value=r.desc||'';
+  } else {
+    document.getElementById('i-fecha').value=hoy();
+    ['i-ref','i-desc'].forEach(x=>document.getElementById(x).value='');
+    document.getElementById('i-eur').value='';
+    document.getElementById('i-bs').value='';
+    document.getElementById('i-usdt').value=0;
+    const disp=document.getElementById('i-usdt-display');
+    if(disp)disp.textContent='0.00 $';
+  }
+  om('modal-i');
+}
+window.openI=openI;
+async function gI(){
+  const eur=parseFloat(document.getElementById('i-eur').value)||0;
+  const bs=parseFloat(document.getElementById('i-bs').value)||0;
+  const usdt=parseFloat(document.getElementById('i-usdt').value)||0;
+  if(!eur&&!bs){alert('Ingresa la tarifa en EUR o los Bs recibidos');return;}
+  const niId=document.getElementById('i-nino').value;
+  const niNombre=niId?ninos.find(x=>x._id===niId)?.nombre||'General':'General';
+  const obj={fecha:document.getElementById('i-fecha').value||hoy(),nino:niNombre,niId,pt:document.getElementById('i-partida').value,tU,tE,bs,usdt,eur,met:document.getElementById('i-metodo').value,ref:document.getElementById('i-ref').value,desc:document.getElementById('i-desc').value};
+  const id=document.getElementById('i-id').value;
+  setSave('Guardando...');
+  try{
+    if(id){await fbUpdate('ingresos',id,obj);const i=ing.findIndex(x=>x._id===id);ing[i]={...obj,_id:id};}
+    else{const nid=await fbAdd('ingresos',obj);ing.push({...obj,_id:nid});}
+    setSave('✓ Guardado');cm('modal-i');ra();
+  }catch(e){setSave('⚠ Error');console.error(e);}
+}
+window.gI=gI;
+async function delI(id){
+  if(!confirm('¿Eliminar este ingreso?'))return;
+  setSave('Guardando...');
+  try{await fbDelete('ingresos',id);ing=ing.filter(x=>x._id!==id);setSave('✓ Guardado');ra();}catch(e){setSave('⚠ Error');}
+}
+window.delI=delI;
+
+// ── EGRESOS ──
+function openE(id=null){
+  document.getElementById('me-t').textContent=id?'Editar egreso':'Registrar egreso';
+  document.getElementById('e-id').value=id||'';
+  document.getElementById('e-partida').innerHTML='<option value="">— Seleccionar —</option>'+gPO('Egreso');
+  if(id){const r=egr.find(x=>x._id===id);document.getElementById('e-fecha').value=r.fecha||hoy();document.getElementById('e-tipo').value=r.tipo||'Nómina';document.getElementById('e-partida').value=r.pt||'';document.getElementById('e-benef').value=r.benef||'';scv('e',{bs:r.bs||0,usdt:r.usdt||0,eur:r.eur||0});document.getElementById('e-conc').value=r.conc||'';document.getElementById('e-ref').value=r.ref||'';document.getElementById('e-desc').value=r.desc||'';}
+  else{document.getElementById('e-fecha').value=hoy();['e-benef','e-conc','e-ref','e-desc'].forEach(x=>document.getElementById(x).value='');clcv('e');}
+  om('modal-e');
+}
+window.openE=openE;
+async function gE(){
+  const cv=gcv('e');
+  if(!cv.bs&&!cv.usdt&&!cv.eur){alert('Ingresa el monto pagado');return;}
+  const obj={fecha:document.getElementById('e-fecha').value||hoy(),tipo:document.getElementById('e-tipo').value,pt:document.getElementById('e-partida').value,benef:document.getElementById('e-benef').value,tU,tE,bs:cv.bs,usdt:cv.usdt,eur:cv.eur,conc:document.getElementById('e-conc').value,ref:document.getElementById('e-ref').value,desc:document.getElementById('e-desc').value};
+  const id=document.getElementById('e-id').value;
+  setSave('Guardando...');
+  try{
+    if(id){await fbUpdate('egresos',id,obj);const i=egr.findIndex(x=>x._id===id);egr[i]={...obj,_id:id};}
+    else{const nid=await fbAdd('egresos',obj);egr.push({...obj,_id:nid});}
+    setSave('✓ Guardado');cm('modal-e');ra();
+  }catch(e){setSave('⚠ Error');console.error(e);}
+}
+window.gE=gE;
+async function delE(id){
+  if(!confirm('¿Eliminar este egreso?'))return;
+  setSave('Guardando...');
+  try{await fbDelete('egresos',id);egr=egr.filter(x=>x._id!==id);setSave('✓ Guardado');ra();}catch(e){setSave('⚠ Error');}
+}
+window.delE=delE;
+
+// ── PERSONAL ──
+function openP(id=null){
+  document.getElementById('mp-t').textContent=id?'Editar personal':'Registrar personal';
+  document.getElementById('p-id').value=id||'';
+  if(id){const p=per.find(x=>x._id===id);document.getElementById('p-nombre').value=p.nombre||'';document.getElementById('p-cargo').value=p.cargo||'Maestra titular';scv('p',{bs:p.sBS||0,usdt:p.sU||0,eur:p.sE||0});document.getElementById('p-freq').value=p.freq||'Quincenal';document.getElementById('p-tel').value=p.tel||'';document.getElementById('p-desc').value=p.desc||'';}
+  else{['p-nombre','p-tel','p-desc'].forEach(x=>document.getElementById(x).value='');clcv('p');}
+  om('modal-p');
+}
+window.openP=openP;
+async function gP(){
+  const nombre=document.getElementById('p-nombre').value.trim();
+  if(!nombre){alert('El nombre es obligatorio');return;}
+  const cv=gcv('p');
+  const id=document.getElementById('p-id').value;
+  const prev=id?per.find(x=>x._id===id):{};
+  const obj={...prev,nombre,cargo:document.getElementById('p-cargo').value,sBS:cv.bs,sU:cv.usdt,sE:cv.eur,freq:document.getElementById('p-freq').value,tel:document.getElementById('p-tel').value,desc:document.getElementById('p-desc').value,up:prev.up||'—'};
+  delete obj._id;
+  setSave('Guardando...');
+  try{
+    if(id){await fbUpdate('personal',id,obj);const i=per.findIndex(x=>x._id===id);per[i]={...obj,_id:id};}
+    else{const nid=await fbAdd('personal',obj);per.push({...obj,_id:nid});}
+    setSave('✓ Guardado');cm('modal-p');ra();
+  }catch(e){setSave('⚠ Error');console.error(e);}
+}
+window.gP=gP;
+async function delP(id){
+  if(!confirm('¿Eliminar?'))return;
+  setSave('Guardando...');
+  try{await fbDelete('personal',id);per=per.filter(x=>x._id!==id);setSave('✓ Guardado');ra();}catch(e){setSave('⚠ Error');}
+}
+window.delP=delP;
+async function pagarPer(id){
+  const p=per.find(x=>x._id===id);
+  if(!confirm(`¿Registrar pago a ${p.nombre}?\n${fBs(p.sBS)} = ${fU(p.sU)} = ${fE(p.sE)}`))return;
+  const obj={fecha:hoy(),tipo:'Nómina',pt:'510',benef:p.nombre,tU,tE,bs:p.sBS,usdt:p.sU,eur:p.sE,conc:`Pago ${p.freq.toLowerCase()} — ${p.cargo}`,ref:'',desc:''};
+  setSave('Guardando...');
+  try{
+    const nid=await fbAdd('egresos',obj);egr.push({...obj,_id:nid});
+    const upd={up:fd(hoy())};await fbUpdate('personal',id,upd);
+    const i=per.findIndex(x=>x._id===id);per[i]={...per[i],...upd};
+    setSave('✓ Guardado');ra();
+  }catch(e){setSave('⚠ Error');console.error(e);}
+}
+window.pagarPer=pagarPer;
+
+// ── PARTIDAS ──
+function openPA(id=null){
+  document.getElementById('mpa-t').textContent=id?'Editar partida':'Nueva partida contable';
+  document.getElementById('pa-id').value=id||'';
+  if(id){
+    const p=pts.find(x=>x._id===id);
+    document.getElementById('pa-cod').value=p.c||'';
+    document.getElementById('pa-tipo').value=p.t||'Ingreso';
+    document.getElementById('pa-nombre').value=p.n||'';
+    document.getElementById('pa-desc').value=p.d||'';
+    document.getElementById('pa-bs').value=p.sBs||'';
+    document.getElementById('pa-usdt').value=p.sU||'';
+    document.getElementById('pa-eur').value=p.sE||'';
+  } else {
+    ['pa-cod','pa-nombre','pa-desc','pa-bs','pa-usdt','pa-eur'].forEach(x=>document.getElementById(x).value='');
+  }
+  // Actualizar hint con tasas del día
+  const hint=document.getElementById('pa-hint');
+  if(hint) hint.textContent=tU&&tE?`Tasas activas — USDT: ${tU} Bs/$ · EUR: ${tE} Bs/€`:'⚠ Ingresa las tasas del día para calcular equivalencias. Puedes ingresar los valores manualmente.';
+  om('modal-pa');
+}
+window.openPA=openPA;
+
+// Conversión de saldo inicial de partida
+function paConv(desde){
+  const v=parseFloat(document.getElementById('pa-'+desde).value)||0;
+  let bs=0,usdt=0,eur=0;
+  if(v>0){
+    if(desde==='bs'){bs=v;usdt=tU?parseFloat((v/tU).toFixed(4)):0;eur=tE?parseFloat((v/tE).toFixed(4)):0;}
+    else if(desde==='usdt'){usdt=v;bs=tU?parseFloat((v*tU).toFixed(2)):0;eur=(bs&&tE)?parseFloat((bs/tE).toFixed(4)):0;}
+    else{eur=v;bs=tE?parseFloat((v*tE).toFixed(2)):0;usdt=(bs&&tU)?parseFloat((bs/tU).toFixed(4)):0;}
+  }
+  if(desde!=='bs')document.getElementById('pa-bs').value=bs||'';
+  if(desde!=='usdt')document.getElementById('pa-usdt').value=usdt||'';
+  if(desde!=='eur')document.getElementById('pa-eur').value=eur||'';
+}
+window.paConv=paConv;
+async function gPA(){
+  const n=document.getElementById('pa-nombre').value.trim();
+  if(!n){alert('El nombre es obligatorio');return;}
+  const sBs=parseFloat(document.getElementById('pa-bs').value)||0;
+  const sU=parseFloat(document.getElementById('pa-usdt').value)||0;
+  const sE=parseFloat(document.getElementById('pa-eur').value)||0;
+  const obj={c:document.getElementById('pa-cod').value,t:document.getElementById('pa-tipo').value,n,d:document.getElementById('pa-desc').value,sBs,sU,sE};
+  const id=document.getElementById('pa-id').value;
+  setSave('Guardando...');
+  try{
+    if(id){await fbUpdate('partidas',id,obj);const i=pts.findIndex(x=>x._id===id);pts[i]={...obj,_id:id};}
+    else{const nid=await fbAdd('partidas',obj);pts.push({...obj,_id:nid});}
+    setSave('✓ Guardado');cm('modal-pa');ra();
+  }catch(e){setSave('⚠ Error');console.error(e);}
+}
+window.gPA=gPA;
+async function delPA(id){
+  if(!confirm('¿Eliminar esta partida?'))return;
+  setSave('Guardando...');
+  try{await fbDelete('partidas',id);pts=pts.filter(x=>x._id!==id);setSave('✓ Guardado');ra();}catch(e){setSave('⚠ Error');}
+}
+window.delPA=delPA;
+
+// ── RENDERS ──
+function rDash(){
+  const tiU=ing.reduce((s,r)=>s+(r.usdt||0),0),teU=egr.reduce((s,r)=>s+(r.usdt||0),0);
+  const tiE=ing.reduce((s,r)=>s+(r.eur||0),0),teE=egr.reduce((s,r)=>s+(r.eur||0),0);
+  const neto=tiU-teU;
+  document.getElementById('cards-resumen').innerHTML=`
+    <div class="card teal"><div class="card-label">Ingresos USDT</div><div class="card-val">${fU(tiU)}</div><div class="card-sub">${fBs(ing.reduce((s,r)=>s+(r.bs||0),0))}</div></div>
+    <div class="card orange"><div class="card-label">Egresos USDT</div><div class="card-val">${fU(teU)}</div><div class="card-sub">${fBs(egr.reduce((s,r)=>s+(r.bs||0),0))}</div></div>
+    <div class="card ${neto>=0?'dark':'orange'}"><div class="card-label">Resultado neto</div><div class="card-val">${fU(neto)}</div><div class="card-sub">${neto>=0?'Superávit':'Déficit'}</div></div>
+    <div class="card euro"><div class="card-label">Equiv. EUR total</div><div class="card-val">${fE(tiE)}</div><div class="card-sub">Egresos: ${fE(teE)}</div></div>
+    <div class="card white"><div class="card-label">Beneficiarios</div><div class="card-val">${ninos.filter(n=>n.activo).length}</div><div class="card-sub">activos registrados</div></div>`;
+  document.getElementById('pend-list').innerHTML=ninos.filter(n=>n.activo).length
+    ?ninos.filter(n=>n.activo).map(n=>`<div class="d-row"><div><div style="font-size:12px;font-weight:600;color:var(--text)">👶 ${n.nombre}</div><div style="font-size:10px;color:var(--text3)">${n.freq} · ${n.serv}</div></div><div style="text-align:right">${n.tE?`<div style="font-size:12px;font-weight:700;color:var(--euro)">${fE(n.tE)}</div>`:''}<div style="font-size:11px;font-weight:700;color:var(--teal)">${fBs(n.tBS)}</div><div style="font-size:10px;color:#059669">${fU(n.tU)}</div></div></div>`).join('')
+    :'<div class="empty">Sin beneficiarios registrados</div>';
+  const todos=[...ing.map(r=>({...r,_t:'I'})),...egr.map(r=>({...r,_t:'E'}))].sort((a,b)=>b.fecha.localeCompare(a.fecha)).slice(0,8);
+  document.getElementById('ult-list').innerHTML=todos.length
+    ?todos.map(t=>`<div class="d-row"><div><div style="font-size:11px;font-weight:600;color:var(--text)">${t._t==='I'?t.nino:(t.conc||t.tipo)}</div><div style="font-size:10px;color:var(--text3)">${fd(t.fecha)}${t.eur?' · '+fE(t.eur):''}</div></div><div style="text-align:right"><span class="${t._t==='I'?'pos':'neg'}">${t._t==='I'?'+':'-'}${fU(t.usdt)}</span><div style="font-size:9px;color:var(--text3)">${t._t==='I'?'+':'-'}${fBs(t.bs)}</div></div></div>`).join('')
+    :'<div class="empty">Sin movimientos aún</div>';
+}
+function rNinos(){
+  document.getElementById('tb-ninos').innerHTML=ninos.length
+    ?ninos.map(n=>`<tr><td><strong>${n.nombre}</strong>${n.desc?`<div style="font-size:9px;color:var(--text3);font-style:italic;margin-top:2px">${n.desc.substring(0,60)}</div>`:''}</td><td>${n.tutor||'—'}<br><span style="font-size:9px;color:var(--text3)">${n.tel||''}</span></td><td><span class="badge teal">${n.serv}</span></td><td class="ecol"><strong>${n.tE?fE(n.tE):'—'}</strong></td><td>${fBs(n.tBS)}</td><td class="pos">${fU(n.tU)}</td><td><span class="badge orange">${n.freq}</span></td><td><div class="td-ac"><button class="btn xs outline" onclick="openN('${n._id}')">✏ Editar</button><button class="btn xs danger" onclick="delN('${n._id}')">✕</button></div></td></tr>`).join('')
+    :'<tr><td colspan="8" class="empty">Sin registros. Haz clic en "+ Registrar niño"</td></tr>';
+}
+function rIngresos(){
+  const s=[...ing].sort((a,b)=>b.fecha.localeCompare(a.fecha));
+  document.getElementById('tb-ingresos').innerHTML=s.length
+    ?s.map(r=>`<tr><td>${fd(r.fecha)}</td><td><strong>${r.nino}</strong></td><td style="font-size:10px;color:var(--text2)">${gNP(r.pt)}</td><td>${r.tcuenta?`<span class="badge teal">${r.tcuenta}</span>`:'—'}</td><td class="pos"><strong>${fBs(r.bs)}</strong></td><td class="pos">${fU(r.usdt)}</td><td class="ecol">${r.eur?fE(r.eur):'—'}</td><td>${r.met}${r.ref?`<br><span style="font-size:9px;color:var(--text3)">Ref: ${r.ref}</span>`:''}</td><td><div class="td-ac"><button class="btn xs outline" onclick="openI('${r._id}')">✏</button><button class="btn xs danger" onclick="delI('${r._id}')">✕</button></div></td></tr>`).join('')
+    :'<tr><td colspan="9" class="empty">Sin registros</td></tr>';
+}
+function rEgresos(){
+  const s=[...egr].sort((a,b)=>b.fecha.localeCompare(a.fecha));
+  document.getElementById('tb-egresos').innerHTML=s.length
+    ?s.map(r=>`<tr><td>${fd(r.fecha)}</td><td>${r.conc||r.tipo}${r.desc?`<div style="font-size:9px;color:var(--text3);font-style:italic">${r.desc.substring(0,45)}</div>`:''}</td><td>${r.benef||'—'}</td><td style="font-size:10px;color:var(--text2)">${gNP(r.pt)}</td><td class="neg"><strong>${fBs(r.bs)}</strong></td><td class="neg">${fU(r.usdt)}</td><td class="ecol">${r.eur?fE(r.eur):'—'}</td><td style="font-size:10px;color:var(--text3)">${r.tU||'—'}</td><td><div class="td-ac"><button class="btn xs outline" onclick="openE('${r._id}')">✏</button><button class="btn xs danger" onclick="delE('${r._id}')">✕</button></div></td></tr>`).join('')
+    :'<tr><td colspan="9" class="empty">Sin registros</td></tr>';
+}
+function rPersonal(){
+  document.getElementById('tb-personal').innerHTML=per.length
+    ?per.map(p=>`<tr><td><strong>${p.nombre}</strong>${p.desc?`<div style="font-size:9px;color:var(--text3);font-style:italic">${p.desc.substring(0,45)}</div>`:''}</td><td>${p.cargo}</td><td>${fBs(p.sBS)}</td><td class="pos">${fU(p.sU)}</td><td class="ecol">${p.sE?fE(p.sE):'—'}</td><td><span class="badge orange">${p.freq}</span></td><td>${p.up}</td><td><div class="td-ac"><button class="btn xs" onclick="pagarPer('${p._id}')">💸 Pagar</button><button class="btn xs outline" onclick="openP('${p._id}')">✏</button><button class="btn xs danger" onclick="delP('${p._id}')">✕</button></div></td></tr>`).join('')
+    :'<tr><td colspan="8" class="empty">Sin registros</td></tr>';
+}
+function rPartidas(){
+  const TIPOS=[
+    {k:'Activo',   emoji:'🏦', color:'#0d9488',         movCol:[]},
+    {k:'Pasivo',   emoji:'📉', color:'#e53935',         movCol:[]},
+    {k:'Capital',  emoji:'💎', color:'#7c3aed',         movCol:[]},
+    {k:'Ingreso',  emoji:'📈', color:'var(--teal)',     movCol:ing},
+    {k:'Egreso',   emoji:'📤', color:'var(--orange)',   movCol:egr},
+  ];
+  const tiposConocidos=TIPOS.map(t=>t.k);
+  // Partidas con tipo no reconocido (legacy) → tratarlas como Ingreso
+  const legacy=pts.filter(p=>!tiposConocidos.includes(p.t));
+  if(legacy.length){
+    legacy.forEach(p=>{ p._tOrig=p.t; p.t='Ingreso'; });
+  }
+  let html='';
+  TIPOS.forEach(({k,emoji,color,movCol})=>{
+    const lista=pts.filter(p=>p.t===k);
+    if(!lista.length)return;
+    html+=`<div style="margin-bottom:18px"><div style="font-size:11px;font-weight:700;color:var(--teal-dark);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;padding-left:4px">${emoji} Partidas de ${k} (${lista.length})</div>`;
+    lista.forEach(p=>{
+      const movs=movCol.filter(r=>r.pt===p.c);
+      const tUp=movs.reduce((s,r)=>s+(r.usdt||0),0);
+      const tEp=movs.reduce((s,r)=>s+(r.eur||0),0);
+      const tBsp=movs.reduce((s,r)=>s+(r.bs||0),0);
+      const sBs=p.sBs||0, sU=p.sU||0, sE=p.sE||0;
+      const totalU=tUp+sU, totalE=tEp+sE, totalBs=tBsp+sBs;
+      const tieneSaldo=sBs||sU||sE;
+      html+=`<div class="pcard">
+        <div class="p-head" style="background:${color}">
+          <div><h4>${p.c} · ${p.n}</h4><div style="font-size:10px;color:rgba(255,255,255,.7)">${movs.length} movimientos</div></div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="text-align:right">
+              <div style="font-size:12px;font-weight:700;color:#fff">${fU(totalU)}</div>
+              ${totalE?`<div style="font-size:10px;color:rgba(255,255,255,.8)">${fE(totalE)}</div>`:''}
+              <div style="font-size:9px;color:rgba(255,255,255,.6)">${fBs(totalBs)}</div>
+            </div>
+            <button style="background:rgba(255,255,255,.2);border:none;color:#fff;padding:4px 9px;border-radius:12px;font-size:10px;cursor:pointer;font-family:Poppins,sans-serif;font-weight:600" onclick="openPA('${p._id}')">✏</button>
+            <button style="background:rgba(255,255,255,.15);border:none;color:#fff;padding:4px 9px;border-radius:12px;font-size:10px;cursor:pointer;font-family:Poppins,sans-serif;font-weight:600" onclick="delPA('${p._id}')">✕</button>
+          </div>
+        </div>
+        <div style="padding:9px 15px;font-size:11px;color:var(--text2)">${p.d||'Sin descripción'}</div>
+        ${tieneSaldo?`<div style="display:flex;gap:18px;padding:7px 15px 9px;border-top:1px solid var(--border);background:#fafafa;font-size:10px">
+          <span style="color:var(--text3);font-weight:600">💰 Saldo inicial:</span>
+          ${sU?`<span style="color:#059669;font-weight:700">${fU(sU)}</span>`:''}
+          ${sE?`<span style="color:var(--euro);font-weight:700">${fE(sE)}</span>`:''}
+          ${sBs?`<span style="color:var(--teal-dark);font-weight:700">${fBs(sBs)}</span>`:''}
+        </div>`:''}
+      </div>`;
+    });
+    html+='</div>';
+  });
+  document.getElementById('lista-partidas').innerHTML=html||'<div class="empty">Sin partidas registradas</div>';
+}
+// ══════════════════════════════════════════════
+// ── MÓDULO REPORTES ──
+// ══════════════════════════════════════════════
+function setRepRapido(){
+  const v=document.getElementById('rep-rapido').value;
+  const hoyS=hoy();
+  const d=new Date();
+  let ini='',fin=hoyS;
+  if(v==='hoy'){ini=hoyS;}
+  else if(v==='sem'){const day=d.getDay()||7;d.setDate(d.getDate()-day+1);ini=d.toISOString().slice(0,10);}
+  else if(v==='mes'){ini=hoyS.slice(0,7)+'-01';}
+  else if(v==='trim'){const q=Math.floor(d.getMonth()/3);ini=d.getFullYear()+'-'+String(q*3+1).padStart(2,'0')+'-01';}
+  else if(v==='year'){ini=d.getFullYear()+'-01-01';}
+  else if(v==='todo'){ini='';fin='';}
+  document.getElementById('rep-ini').value=ini;
+  document.getElementById('rep-fin').value=fin;
+  if(v)renderReportes();
+}
+window.setRepRapido=setRepRapido;
+
+function renderReportes(){
+  const ini=document.getElementById('rep-ini').value;
+  const fin=document.getElementById('rep-fin').value;
+  const enRango=r=>(!ini||r.fecha>=ini)&&(!fin||r.fecha<=fin);
+
+  const ingF=ing.filter(enRango);
+  const egrF=egr.filter(enRango);
+
+  const totIngBs=ingF.reduce((s,r)=>s+(r.bs||0),0);
+  const totIngU=ingF.reduce((s,r)=>s+(r.usdt||0),0);
+  const totIngE=ingF.reduce((s,r)=>s+(r.eur||0),0);
+  const totEgrBs=egrF.reduce((s,r)=>s+(r.bs||0),0);
+  const totEgrU=egrF.reduce((s,r)=>s+(r.usdt||0),0);
+  const totEgrE=egrF.reduce((s,r)=>s+(r.eur||0),0);
+
+  // Acumular por partida
+  const ingPorPart={}, egrPorPart={};
+  ingF.forEach(r=>{if(!ingPorPart[r.pt])ingPorPart[r.pt]={bs:0,usdt:0,eur:0};ingPorPart[r.pt].bs+=(r.bs||0);ingPorPart[r.pt].usdt+=(r.usdt||0);ingPorPart[r.pt].eur+=(r.eur||0);});
+  egrF.forEach(r=>{if(!egrPorPart[r.pt])egrPorPart[r.pt]={bs:0,usdt:0,eur:0};egrPorPart[r.pt].bs+=(r.bs||0);egrPorPart[r.pt].usdt+=(r.usdt||0);egrPorPart[r.pt].eur+=(r.eur||0);});
+
+  // Helpers de fila
+  const fSep=(label,color='#1a3a5c')=>`<tr style="background:${color}"><td colspan="4" style="color:#fff;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;padding:9px 18px">${label}</td></tr>`;
+  const fRow=(label,bs,u,e,bold=false,bg='',colorU='')=>{
+    const s=bold?'font-weight:700':'font-size:11px';
+    const cu=colorU||(u>=0?'#1a5276':'#c0392b');
+    return `<tr style="${bg?'background:'+bg:''}border-bottom:1px solid #eef">
+      <td style="padding:9px 18px 9px ${bold?'18':'30'}px;${s};color:#1a3a5c">${label}</td>
+      <td style="text-align:right;padding:9px 18px;${s};color:#2c3e50">${bs?fBs(bs):'0,00 Bs.'}</td>
+      <td style="text-align:right;padding:9px 18px;${s};color:${cu};font-weight:${bold?700:500}">${fU(u)}</td>
+      <td style="text-align:right;padding:9px 18px;${s};color:var(--euro)">${e?fE(e):'0,00 €'}</td>
+    </tr>`;
+  };
+
+  let rows='';
+
+  // ── I. INGRESOS ──
+  rows+=fSep('I. Ingresos operativos','#1a5276');
+  const ingPartidas=pts.filter(p=>p.t==='Ingreso');
+  ingPartidas.forEach(p=>{
+    const d=ingPorPart[p.c]||{bs:0,usdt:0,eur:0};
+    const si={bs:p.sBs||0,usdt:p.sU||0,eur:p.sE||0};
+    const tb=d.bs+si.bs, tu=d.usdt+si.usdt, te=d.eur+si.eur;
+    if(tu||te||tb)rows+=fRow(p.n,tb,tu,te);
+  });
+  const sinPart=ingF.filter(r=>!r.pt);
+  if(sinPart.length){const b=sinPart.reduce((s,r)=>s+(r.bs||0),0),u=sinPart.reduce((s,r)=>s+(r.usdt||0),0),e=sinPart.reduce((s,r)=>s+(r.eur||0),0);rows+=fRow('Otros ingresos',b,u,e);}
+  rows+=fRow('TOTAL INGRESOS',totIngBs,totIngU,totIngE,true,'#ebf5fb','#1a5276');
+
+  // ── II. EGRESOS ──
+  rows+=fSep('II. Egresos operativos','#641e16');
+  const egrPartidas=pts.filter(p=>p.t==='Egreso');
+  egrPartidas.forEach(p=>{
+    const d=egrPorPart[p.c]||{bs:0,usdt:0,eur:0};
+    const si={bs:p.sBs||0,usdt:p.sU||0,eur:p.sE||0};
+    const tb=d.bs+si.bs, tu=d.usdt+si.usdt, te=d.eur+si.eur;
+    if(tu||te||tb)rows+=fRow(p.n,tb,tu,te);
+  });
+  const sinPartE=egrF.filter(r=>!r.pt);
+  if(sinPartE.length){const b=sinPartE.reduce((s,r)=>s+(r.bs||0),0),u=sinPartE.reduce((s,r)=>s+(r.usdt||0),0),e=sinPartE.reduce((s,r)=>s+(r.eur||0),0);rows+=fRow('Otros egresos',b,u,e);}
+  rows+=fRow('TOTAL EGRESOS',totEgrBs,totEgrU,totEgrE,true,'#fdedec','#c0392b');
+
+  // ── RESULTADO ──
+  const netoBs=totIngBs-totEgrBs, netoU=totIngU-totEgrU, netoE=totIngE-totEgrE;
+  rows+=fSep(netoU>=0?'✅ Resultado del período — UTILIDAD':'❌ Resultado del período — PÉRDIDA', netoU>=0?'#1e8449':'#c0392b');
+  rows+=`<tr style="background:${netoU>=0?'#eafaf1':'#fdedec'}">
+    <td style="padding:12px 18px;font-weight:700;font-size:13px;color:${netoU>=0?'#1e8449':'#c0392b'}">${netoU>=0?'UTILIDAD NETA':'PÉRDIDA NETA'}</td>
+    <td style="text-align:right;padding:12px 18px;font-weight:700;font-size:13px;color:#2c3e50">${fBs(netoBs)}</td>
+    <td style="text-align:right;padding:12px 18px;font-weight:700;font-size:15px;color:${netoU>=0?'#1e8449':'#c0392b'}">${fU(netoU)}</td>
+    <td style="text-align:right;padding:12px 18px;font-weight:700;font-size:13px;color:var(--euro)">${fE(netoE)}</td>
+  </tr>`;
+
+  document.getElementById('tb-rep-resultados').innerHTML=rows;
+
+  // ── Cards resumen ──
+  const cards=[
+    {label:'💰 Total Ingresos',val:fU(totIngU),sub:fBs(totIngBs),eur:fE(totIngE),color:'#1a5276',bg:'#ebf5fb',border:'#2980b9'},
+    {label:'📤 Total Egresos',val:fU(totEgrU),sub:fBs(totEgrBs),eur:fE(totEgrE),color:'#c0392b',bg:'#fdedec',border:'#e74c3c'},
+    {label:'📊 Resultado Neto',val:fU(netoU),sub:fBs(netoBs),eur:fE(netoE),color:netoU>=0?'#1e8449':'#c0392b',bg:netoU>=0?'#eafaf1':'#fdedec',border:netoU>=0?'#27ae60':'#e74c3c'},
+    {label:'📋 Movimientos',val:String(ingF.length+egrF.length),sub:`${ingF.length} ingresos · ${egrF.length} egresos`,eur:'',color:'#6c3483',bg:'#f5eef8',border:'#8e44ad'},
+  ];
+  document.getElementById('rep-resumen').innerHTML=cards.map(c=>`
+    <div style="background:${c.bg};border:2px solid ${c.border};border-radius:14px;padding:14px 16px">
+      <div style="font-size:10px;font-weight:700;color:${c.color};margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">${c.label}</div>
+      <div style="font-size:20px;font-weight:700;color:${c.color}">${c.val}</div>
+      <div style="font-size:10px;color:${c.color};opacity:.75;margin-top:3px">${c.sub}</div>
+      ${c.eur?`<div style="font-size:10px;color:var(--euro);margin-top:2px;font-weight:600">${c.eur}</div>`:''}
+    </div>`).join('');
+}
+window.renderReportes=renderReportes;
+
+function exportarReporte(){
+  const ini=document.getElementById('rep-ini').value;
+  const fin=document.getElementById('rep-fin').value;
+  const enRango=r=>(!ini||r.fecha>=ini)&&(!fin||r.fecha<=fin);
+  const ingF=ing.filter(enRango), egrF=egr.filter(enRango);
+  let csv='Tipo,Fecha,Concepto,Partida,Bs,USDT,EUR\n';
+  ingF.forEach(r=>csv+=`Ingreso,${r.fecha},${r.nino||''},${gNP(r.pt)},${r.bs||0},${r.usdt||0},${r.eur||0}\n`);
+  egrF.forEach(r=>csv+=`Egreso,${r.fecha},${r.conc||r.tipo||''},${gNP(r.pt)},${r.bs||0},${r.usdt||0},${r.eur||0}\n`);
+  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download=`reporte_${ini||'todo'}_${fin||'todo'}.csv`;a.click();
+}
+window.exportarReporte=exportarReporte;
+function setRepRapido(){
+  const v=document.getElementById('rep-rapido').value;
+  const hoyS=hoy();
+  const d=new Date();
+  let ini='',fin=hoyS;
+  if(v==='hoy'){ini=hoyS;}
+  else if(v==='sem'){const day=d.getDay()||7;d.setDate(d.getDate()-day+1);ini=d.toISOString().slice(0,10);}
+  else if(v==='mes'){ini=hoyS.slice(0,7)+'-01';}
+  else if(v==='trim'){const q=Math.floor(d.getMonth()/3);ini=d.getFullYear()+'-'+String(q*3+1).padStart(2,'0')+'-01';}
+  else if(v==='year'){ini=d.getFullYear()+'-01-01';}
+  else if(v==='todo'){ini='';fin='';}
+  document.getElementById('rep-ini').value=ini;
+  document.getElementById('rep-fin').value=fin;
+  if(v)renderReportes();
+}
+window.setRepRapido=setRepRapido;
+
+function renderReportes(){
+  const ini=document.getElementById('rep-ini').value;
+  const fin=document.getElementById('rep-fin').value;
+  const enRango=r=>(!ini||r.fecha>=ini)&&(!fin||r.fecha<=fin);
+
+  const ingF=ing.filter(enRango);
+  const egrF=egr.filter(enRango);
+
+  // Totales ingresos
+  const totIngBs=ingF.reduce((s,r)=>s+(r.bs||0),0);
+  const totIngU=ingF.reduce((s,r)=>s+(r.usdt||0),0);
+  // Totales egresos
+  const totEgrBs=egrF.reduce((s,r)=>s+(r.bs||0),0);
+  const totEgrU=egrF.reduce((s,r)=>s+(r.usdt||0),0);
+  // Por partida
+  const ingPorPart={}, egrPorPart={};
+  ingF.forEach(r=>{if(!ingPorPart[r.pt])ingPorPart[r.pt]={bs:0,usdt:0};ingPorPart[r.pt].bs+=(r.bs||0);ingPorPart[r.pt].usdt+=(r.usdt||0);});
+  egrF.forEach(r=>{if(!egrPorPart[r.pt])egrPorPart[r.pt]={bs:0,usdt:0};egrPorPart[r.pt].bs+=(r.bs||0);egrPorPart[r.pt].usdt+=(r.usdt||0);});
+
+  // ── Estado de Resultados ──
+  const tbR=document.getElementById('tb-rep-resultados').querySelector('tbody');
+  let rowsR='';
+  const fRow=(label,bs,u,cls='',indent=false)=>`<tr${cls?` style="background:${cls}"`:''}><td style="text-align:left;${indent?'padding-left:28px;font-size:11px;color:var(--text2)':'font-weight:700'}">${label}</td><td>${fBs(bs)}</td><td style="font-weight:${indent?'400':'700'};color:${u>=0?'var(--teal-dark)':'var(--red)'}">${fU(u)}</td></tr>`;
+  const fSep=(label)=>`<tr style="background:#1a3a5c"><td colspan="3" style="color:#fff;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;padding:8px 16px">${label}</td></tr>`;
+
+  // I. Ingresos
+  rowsR+=fSep('I. Ingresos operativos');
+  const ingPartidas=pts.filter(p=>p.t==='Ingreso');
+  ingPartidas.forEach(p=>{
+    const d=ingPorPart[p.c]||{bs:0,usdt:0};
+    const si=p.sU||0, siBs=p.sBs||0;
+    if(d.usdt||si)rowsR+=fRow(`${p.n}`,d.bs+siBs,d.usdt+si,'',true);
+  });
+  // Ingresos sin partida
+  const sinPart=ingF.filter(r=>!r.pt);
+  if(sinPart.length){const bs=sinPart.reduce((s,r)=>s+(r.bs||0),0),u=sinPart.reduce((s,r)=>s+(r.usdt||0),0);rowsR+=fRow('Otros ingresos',bs,u,'',true);}
+  rowsR+=fRow('TOTAL INGRESOS',totIngBs,totIngU,'#e0f5f3');
+
+  // II. Egresos
+  rowsR+=fSep('II. Egresos operativos');
+  const egrPartidas=pts.filter(p=>p.t==='Egreso');
+  egrPartidas.forEach(p=>{
+    const d=egrPorPart[p.c]||{bs:0,usdt:0};
+    const si=p.sU||0, siBs=p.sBs||0;
+    if(d.usdt||si)rowsR+=fRow(`${p.n}`,d.bs+siBs,d.usdt+si,'',true);
+  });
+  const sinPartE=egrF.filter(r=>!r.pt);
+  if(sinPartE.length){const bs=sinPartE.reduce((s,r)=>s+(r.bs||0),0),u=sinPartE.reduce((s,r)=>s+(r.usdt||0),0);rowsR+=fRow('Otros egresos',bs,u,'',true);}
+  rowsR+=fRow('TOTAL EGRESOS',totEgrBs,totEgrU,'#fdecea');
+
+  // Resultado
+  const netoBs=totIngBs-totEgrBs, netoU=totIngU-totEgrU;
+  rowsR+=fSep('Resultado del período');
+  rowsR+=`<tr style="background:${netoU>=0?'#e0f5f3':'#fdecea'}"><td style="text-align:left;font-weight:700;font-size:13px">${netoU>=0?'✅ UTILIDAD NETA':'❌ PÉRDIDA NETA'}</td><td style="font-weight:700">${fBs(netoBs)}</td><td style="font-weight:700;font-size:13px;color:${netoU>=0?'#065f46':'var(--red)'}">${fU(netoU)}</td></tr>`;
+  tbR.innerHTML=rowsR;
+
+  // ── Balance General ──
+  const tbB=document.getElementById('tb-rep-balance').querySelector('tbody');
+  let rowsB='';
+  const balTipos=['Activo','Pasivo','Capital'];
+  balTipos.forEach(tipo=>{
+    const lista=pts.filter(p=>p.t===tipo);
+    if(!lista.length)return;
+    const emoji={Activo:'🏦',Pasivo:'📉',Capital:'💎'}[tipo];
+    rowsB+=fSep(`${emoji} ${tipo}s`);
+    let totBs=0,totU=0;
+    lista.forEach(p=>{
+      totBs+=(p.sBs||0);totU+=(p.sU||0);
+      if(p.sU||p.sBs)rowsB+=fRow(p.n,p.sBs||0,p.sU||0,'',true);
+    });
+    // Sumar movimientos del balance contable
+    balAsientos.filter(a=>a.tipo.toLowerCase()===tipo.toLowerCase()).forEach(a=>{totBs+=(a.bs||0);totU+=(a.usdt||0);rowsB+=fRow(a.conc,a.bs||0,a.usdt||0,'',true);});
+    rowsB+=fRow(`TOTAL ${tipo.toUpperCase()}S`,totBs,totU,'#f0f4ff');
+  });
+  // Agregar resultado al balance
+  rowsB+=fSep('Resultado del período');
+  rowsB+=fRow('Utilidad / Pérdida',netoBs,netoU,netoU>=0?'#e0f5f3':'#fdecea');
+  tbB.innerHTML=rowsB;
+
+  // ── Resumen ejecutivo ──
+  const cards=[
+    {label:'💰 Total Ingresos',val:fU(totIngU),sub:fBs(totIngBs),color:'#0d9488',bg:'#e0f5f3'},
+    {label:'📤 Total Egresos',val:fU(totEgrU),sub:fBs(totEgrBs),color:'#e53935',bg:'#fdecea'},
+    {label:'📊 Resultado Neto',val:fU(netoU),sub:fBs(netoBs),color:netoU>=0?'#059669':'#e53935',bg:netoU>=0?'#d1fae5':'#fdecea'},
+    {label:'📋 Movimientos',val:ingF.length+egrF.length,sub:`${ingF.length} ing · ${egrF.length} egr`,color:'#7c3aed',bg:'#ede9fe'},
+  ];
+  document.getElementById('rep-resumen').innerHTML=cards.map(c=>`<div style="background:${c.bg};border:2px solid ${c.color};border-radius:12px;padding:14px 16px"><div style="font-size:10px;font-weight:700;color:${c.color};margin-bottom:6px">${c.label}</div><div style="font-size:18px;font-weight:700;color:${c.color}">${c.val}</div><div style="font-size:10px;color:${c.color};opacity:.7;margin-top:2px">${c.sub}</div></div>`).join('');
+}
+window.renderReportes=renderReportes;
+
+function exportarReporte(){
+  const ini=document.getElementById('rep-ini').value;
+  const fin=document.getElementById('rep-fin').value;
+  const enRango=r=>(!ini||r.fecha>=ini)&&(!fin||r.fecha<=fin);
+  const ingF=ing.filter(enRango), egrF=egr.filter(enRango);
+  let csv='Tipo,Fecha,Concepto,Partida,Bs,USDT,EUR\n';
+  ingF.forEach(r=>csv+=`Ingreso,${r.fecha},${r.nino||''},${gNP(r.pt)},${r.bs||0},${r.usdt||0},${r.eur||0}\n`);
+  egrF.forEach(r=>csv+=`Egreso,${r.fecha},${r.conc||r.tipo||''},${gNP(r.pt)},${r.bs||0},${r.usdt||0},${r.eur||0}\n`);
+  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download=`reporte_${ini||'todo'}_${fin||'todo'}.csv`;a.click();
+}
+window.exportarReporte=exportarReporte;
+
+function ra(){rDash();rNinos();rIngresos();rEgresos();rPersonal();rPartidas();renderReportes();}
+
+// ══════════════════════════════════════════════
+// ── MÓDULO BALANCE CONTABLE ──
+// ══════════════════════════════════════════════
+let balFiltro='todos';
+
+const BAL_COLORES={
+  activo:{cls:'a',color:'#0d9488',bg:'#e0f5f3',label:'Activo',emoji:'🏦'},
+  pasivo:{cls:'p',color:'#e53935',bg:'#fdecea',label:'Pasivo',emoji:'📉'},
+  capital:{cls:'k',color:'#7c3aed',bg:'#ede9fe',label:'Capital',emoji:'💎'},
+  ingreso:{cls:'i',color:'#059669',bg:'#d1fae5',label:'Ingreso',emoji:'📈'},
+  egreso:{cls:'e',color:'#e76f1a',bg:'#fff3ea',label:'Egreso',emoji:'📤'},
+};
+
+function setBTab(filtro){
+  balFiltro=filtro;
+  ['todos','activo','pasivo','capital','ingreso','egreso'].forEach(k=>{
+    const btn=document.getElementById('btab-'+k);
+    if(!btn)return;
+    if(k===filtro){
+      const clsMap={todos:'act-a',activo:'act-a',pasivo:'act-p',capital:'act-k',ingreso:'act-i',egreso:'act-e'};
+      btn.className=clsMap[k];
+    } else {
+      btn.className='inact';
+    }
+  });
+  renderBalance();
+}
+window.setBTab=setBTab;
+
+function onBalTipo(){
+  const tipo=document.getElementById('bal-tipo').value;
+  const c=BAL_COLORES[tipo];
+  const btn=document.getElementById('bal-save-btn');
+  const conv=document.getElementById('bal-conv-title');
+  if(btn)btn.style.background=c.color;
+  if(conv)conv.textContent=`💱 Monto — ${c.emoji} ${c.label}`;
+}
+window.onBalTipo=onBalTipo;
+
+function openBal(id=null){
+  document.getElementById('mbal-t').textContent=id?'Editar asiento':'Nuevo asiento contable';
+  document.getElementById('bal-id').value=id||'';
+  if(id){
+    const r=balAsientos.find(x=>x._id===id);
+    document.getElementById('bal-fecha').value=r.fecha||hoy();
+    document.getElementById('bal-tipo').value=r.tipo||'activo';
+    document.getElementById('bal-cat').value=r.cat||'';
+    document.getElementById('bal-conc').value=r.conc||'';
+    scv('bal',{bs:r.bs||0,usdt:r.usdt||0,eur:r.eur||0});
+    document.getElementById('bal-notas').value=r.notas||'';
+  } else {
+    document.getElementById('bal-fecha').value=hoy();
+    ['bal-cat','bal-conc','bal-notas'].forEach(x=>document.getElementById(x).value='');
+    document.getElementById('bal-tipo').value='activo';
+    clcv('bal');
+  }
+  onBalTipo();
+  om('modal-bal');
+}
+window.openBal=openBal;
+
+async function gBal(){
+  const conc=document.getElementById('bal-conc').value.trim();
+  const cat=document.getElementById('bal-cat').value.trim();
+  if(!conc||!cat){alert('Concepto y categoría son obligatorios');return;}
+  const cv=gcv('bal');
+  if(!cv.bs&&!cv.usdt&&!cv.eur){alert('Ingresa al menos un monto');return;}
+  const obj={
+    fecha:document.getElementById('bal-fecha').value||hoy(),
+    tipo:document.getElementById('bal-tipo').value,
+    cat,conc,
+    bs:cv.bs,usdt:cv.usdt,eur:cv.eur,
+    notas:document.getElementById('bal-notas').value,
+    tU,tE
+  };
+  const id=document.getElementById('bal-id').value;
+  setSave('Guardando...');
+  try{
+    if(id){await fbUpdate('balance',id,obj);const i=balAsientos.findIndex(x=>x._id===id);balAsientos[i]={...obj,_id:id};}
+    else{const nid=await fbAdd('balance',obj);balAsientos.push({...obj,_id:nid});}
+    setSave('✓ Guardado');cm('modal-bal');renderBalance();
+  }catch(e){setSave('⚠ Error');console.error(e);}
+}
+window.gBal=gBal;
+
+async function delBal(id){
+  if(!confirm('¿Eliminar este asiento?'))return;
+  setSave('Guardando...');
+  try{await fbDelete('balance',id);balAsientos=balAsientos.filter(x=>x._id!==id);setSave('✓ Guardado');renderBalance();}
+  catch(e){setSave('⚠ Error');}
+}
+window.delBal=delBal;
+
+function renderBalance(){
+  // ── Totales por tipo ──
+  const tot={activo:{bs:0,usdt:0,eur:0},pasivo:{bs:0,usdt:0,eur:0},capital:{bs:0,usdt:0,eur:0},ingreso:{bs:0,usdt:0,eur:0},egreso:{bs:0,usdt:0,eur:0}};
+  balAsientos.forEach(r=>{
+    if(tot[r.tipo]){tot[r.tipo].bs+=(r.bs||0);tot[r.tipo].usdt+=(r.usdt||0);tot[r.tipo].eur+=(r.eur||0);}
+  });
+
+  // ── Cards resumen ──
+  const cardsEl=document.getElementById('bal-cards');
+  if(cardsEl){
+    let html='';
+    Object.entries(BAL_COLORES).forEach(([k,c])=>{
+      const t=tot[k];
+      html+=`<div class="ec-card ${c.cls}"><div class="ec-card-lbl">${c.emoji} ${c.label}</div><div class="ec-card-val">${fU(t.usdt)}</div><div style="font-size:9px;opacity:.75;font-weight:600;margin-top:2px">${fBs(t.bs)}</div></div>`;
+    });
+    // Tarjeta de resultado neto
+    const netoU=(tot.activo.usdt+tot.ingreso.usdt)-(tot.pasivo.usdt+tot.capital.usdt+tot.egreso.usdt);
+    html+=`<div class="ec-card" style="background:${netoU>=0?'#d1fae5':'#fdecea'};border-color:${netoU>=0?'#059669':'#e53935'}"><div class="ec-card-lbl" style="color:${netoU>=0?'#059669':'#e53935'}">📊 Patrimonio Neto</div><div class="ec-card-val" style="color:${netoU>=0?'#059669':'#e53935'}">${fU(netoU)}</div></div>`;
+    cardsEl.innerHTML=html;
+  }
+
+  // ── Balance General estructurado ──
+  const balEl=document.getElementById('bal-general');
+  if(balEl){
+    // Agrupar activos y pasivos por categoría
+    const grupos={};
+    balAsientos.forEach(r=>{
+      const k=r.tipo+'||'+r.cat;
+      if(!grupos[k])grupos[k]={tipo:r.tipo,cat:r.cat,items:[],bs:0,usdt:0,eur:0};
+      grupos[k].items.push(r);
+      grupos[k].bs+=(r.bs||0);grupos[k].usdt+=(r.usdt||0);grupos[k].eur+=(r.eur||0);
+    });
+
+    const renderGrupo=(tipo)=>{
+      const c=BAL_COLORES[tipo];
+      const t=tot[tipo];
+      if(!balAsientos.filter(r=>r.tipo===tipo).length) return '';
+      let h=`<div class="bal-section"><div class="bal-section-head ${tipo==='activo'?'activo':tipo==='pasivo'?'pasivo':'capital'}" style="background:${c.color}"><span>${c.emoji} ${c.label}s</span><span>${fU(t.usdt)}</span></div>`;
+      Object.values(grupos).filter(g=>g.tipo===tipo).forEach(g=>{
+        h+=`<div class="bal-row" style="background:#fafafa"><strong style="color:${c.color}">${g.cat}</strong><span style="font-size:10px;color:var(--text2)">${g.items.length} asiento${g.items.length!==1?'s':''}</span><span style="font-weight:700;color:${c.color}">${fU(g.usdt)}</span></div>`;
+        g.items.forEach(r=>{
+          h+=`<div class="bal-row" style="padding-left:28px"><span style="color:var(--text2)">↳ ${r.conc} <span style="font-size:9px;opacity:.6">${fd(r.fecha)}</span></span><span style="font-size:10px;color:var(--text2)">${fBs(r.bs)}</span><span>${fU(r.usdt)}</span></div>`;
+        });
+      });
+      h+=`<div class="bal-row subtotal"><span>Total ${c.label}s</span><span>${fU(t.usdt)}</span></div></div>`;
+      return h;
+    };
+
+    let html='';
+    // Ecuación contable: A = P + K + (I - E)
+    const pasivosK=tot.pasivo.usdt+tot.capital.usdt+(tot.ingreso.usdt-tot.egreso.usdt);
+    const activosTotal=tot.activo.usdt;
+
+    html+=renderGrupo('activo');
+    html+=renderGrupo('pasivo');
+    html+=renderGrupo('capital');
+    // Ingresos y egresos resumidos
+    const tipoIE=['ingreso','egreso'];
+    tipoIE.forEach(tipo=>{
+      const c=BAL_COLORES[tipo];
+      const t=tot[tipo];
+      if(!balAsientos.filter(r=>r.tipo===tipo).length)return;
+      let h=`<div class="bal-section"><div class="bal-section-head" style="background:${c.color}"><span>${c.emoji} ${c.label}s</span><span>${fU(t.usdt)}</span></div>`;
+      Object.values(grupos).filter(g=>g.tipo===tipo).forEach(g=>{
+        h+=`<div class="bal-row" style="background:#fafafa"><strong style="color:${c.color}">${g.cat}</strong><span style="font-size:10px;color:var(--text2)">${g.items.length} asiento${g.items.length!==1?'s':''}</span><span style="font-weight:700;color:${c.color}">${fU(g.usdt)}</span></div>`;
+        g.items.forEach(r=>{
+          h+=`<div class="bal-row" style="padding-left:28px"><span style="color:var(--text2)">↳ ${r.conc} <span style="font-size:9px;opacity:.6">${fd(r.fecha)}</span></span><span style="font-size:10px;color:var(--text2)">${fBs(r.bs)}</span><span>${fU(r.usdt)}</span></div>`;
+        });
+      });
+      h+=`<div class="bal-row subtotal"><span>Total ${c.label}s</span><span>${fU(t.usdt)}</span></div></div>`;
+      html+=h;
+    });
+
+    // Ecuación final
+    if(balAsientos.length){
+      const netoU=tot.ingreso.usdt-tot.egreso.usdt;
+      html+=`<div class="bal-section"><div class="bal-row grand"><span>📊 Resultado del período (I - E)</span><span class="${netoU>=0?'':'neg'}" style="color:${netoU>=0?'#4fffaa':'#ff8080'}">${fU(netoU)}</span></div>
+      <div class="bal-row grand" style="background:rgba(0,0,0,.15)"><span>⚖️ Total Activos</span><span>${fU(tot.activo.usdt)}</span></div>
+      <div class="bal-row grand" style="background:rgba(0,0,0,.15)"><span>⚖️ Pasivos + Capital + Resultado</span><span>${fU(pasivosK)}</span></div>
+      <div class="bal-row grand" style="background:${Math.abs(activosTotal-pasivosK)<0.01?'rgba(79,255,170,.15)':'rgba(255,80,80,.15)'}">
+        <span>${Math.abs(activosTotal-pasivosK)<0.01?'✅ Balance cuadrado':'⚠️ Balance descuadrado'}</span>
+        <span>${Math.abs(activosTotal-pasivosK)<0.01?'0.00 $':fU(Math.abs(activosTotal-pasivosK))+' diferencia'}</span>
+      </div></div>`;
+    } else {
+      html='<div class="empty">No hay asientos contables registrados. Haz clic en <strong>+ Nuevo asiento</strong> para comenzar.</div>';
+    }
+    balEl.innerHTML=html;
+  }
+
+  // ── Tabla de detalle ──
+  const filtrados=balFiltro==='todos'?balAsientos:balAsientos.filter(r=>r.tipo===balFiltro);
+  const titulo=document.getElementById('bal-tabla-title');
+  if(titulo)titulo.textContent=`📋 Detalle — ${balFiltro==='todos'?'Todos los asientos':BAL_COLORES[balFiltro]?.label+'s'}`;
+  const tbody=document.getElementById('tb-balance');
+  if(!tbody)return;
+  if(!filtrados.length){tbody.innerHTML=`<tr><td colspan="9" class="empty">Sin asientos${balFiltro!=='todos'?' de tipo '+BAL_COLORES[balFiltro]?.label:''}</td></tr>`;return;}
+  const sorted=[...filtrados].sort((a,b)=>b.fecha.localeCompare(a.fecha));
+  tbody.innerHTML=sorted.map(r=>{
+    const c=BAL_COLORES[r.tipo]||{};
+    return `<tr>
+      <td>${fd(r.fecha)}</td>
+      <td><span class="bal-tag ${c.cls}">${c.emoji} ${c.label}</span></td>
+      <td><strong>${r.conc}</strong></td>
+      <td style="color:${c.color};font-weight:600">${r.cat}</td>
+      <td>${fBs(r.bs)}</td>
+      <td style="font-weight:700">${fU(r.usdt)}</td>
+      <td style="color:var(--euro)">${fE(r.eur)}</td>
+      <td style="font-size:10px;color:var(--text2)">${r.notas||'—'}</td>
+      <td><div class="td-ac">
+        <button class="btn xs outline" onclick="openBal('${r._id}')">✏</button>
+        <button class="btn xs danger" onclick="delBal('${r._id}')">✕</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+window.renderBalance=renderBalance;
+
+function exportar(){
+  const tiU=ing.reduce((s,r)=>s+(r.usdt||0),0),teU=egr.reduce((s,r)=>s+(r.usdt||0),0);
+  const tiE=ing.reduce((s,r)=>s+(r.eur||0),0),teE=egr.reduce((s,r)=>s+(r.eur||0),0);
+  const tiBs=ing.reduce((s,r)=>s+(r.bs||0),0),teBs=egr.reduce((s,r)=>s+(r.bs||0),0);
+  const ahora=new Date().toLocaleDateString('es-VE',{year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  let txt=`${'═'.repeat(52)}\n   REPORTE ADMINISTRATIVO — GUARDERÍA TIABELLY\n   Generado: ${ahora}\n   Tasa USDT: ${tU} Bs/$ · Tasa EUR: ${tE} Bs/€\n${'═'.repeat(52)}\n\n`;
+  txt+=`RESULTADO\n${'─'.repeat(52)}\n  Ingresos USDT: ${fU(tiU)}\n  Egresos USDT:  -${fU(teU)}\n  Neto:          ${fU(tiU-teU)}\n  Ingresos Bs:   ${fBs(tiBs)}\n  Egresos Bs:   -${fBs(teBs)}\n  Ingresos EUR:  ${fE(tiE)}\n  Egresos EUR:  -${fE(teE)}\n\n`;
+  txt+=`BENEFICIARIOS (${ninos.length})\n${'─'.repeat(52)}\n`;
+  ninos.forEach(n=>txt+=`  ${n.nombre} | ${n.serv} | ${n.freq} | EUR: ${fE(n.tE)} | Bs: ${fBs(n.tBS)} | USDT: ${fU(n.tU)}\n`);
+  txt+=`\nINGRESOS (${ing.length})\n${'─'.repeat(52)}\n`;
+  [...ing].sort((a,b)=>a.fecha.localeCompare(b.fecha)).forEach(r=>txt+=`  ${fd(r.fecha)} | ${r.nino} | ${r.per||'—'} | ${fBs(r.bs)} = ${fU(r.usdt)} = ${fE(r.eur)} | ${r.met}\n`);
+  txt+=`\nEGRESOS (${egr.length})\n${'─'.repeat(52)}\n`;
+  [...egr].sort((a,b)=>a.fecha.localeCompare(b.fecha)).forEach(r=>txt+=`  ${fd(r.fecha)} | ${r.conc||r.tipo} | ${r.benef||'—'} | ${fBs(r.bs)} = ${fU(r.usdt)} = ${fE(r.eur)}\n`);
+  txt+=`\n${'═'.repeat(52)}\nFin del reporte\n`;
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([txt],{type:'text/plain;charset=utf-8'}));
+  a.download=`reporte-guarderia-${new Date().toISOString().split('T')[0]}.txt`;
+  a.click();
+}
+window.exportar=exportar;
+
+document.getElementById('filtro-fecha').value=hoy();
+loadAll();
+</script>
+</body>
+</html>
