@@ -205,9 +205,7 @@ tr:hover td{background:var(--teal-light)}
   <button class="tab" onclick="showTab('egresos',this)">📤 Egresos</button>
   <button class="tab" onclick="showTab('personal',this)">👩‍🏫 Personal</button>
   <button class="tab" onclick="showTab('partidas',this)">📂 Partidas</button>
-  <button class="tab" onclick="showTab('mayor',this)">📒 Libro Mayor</button>
-  <button class="tab" onclick="showTab('diario',this)">📋 Diario</button>
-  <button class="tab" onclick="showTab('balance',this)">⚖️ Balance</button>
+  <button class="tab" onclick="showTab('reportes',this)">📊 Reportes</button>
 </div>
 <div class="content">
 <div class="section active" id="sec-dashboard">
@@ -250,48 +248,62 @@ tr:hover td{background:var(--teal-light)}
   <div class="sac"><span class="sec-title">Catálogo de partidas contables</span><button class="btn" onclick="openPA()">+ Nueva partida</button></div>
   <div id="lista-partidas"></div>
 </div>
-<div class="section" id="sec-mayor">
-  <div class="sac"><span class="sec-title">Libro mayor por partida</span>
-    <select id="filtro-mayor" class="flt" style="border-radius:9px" onchange="renderMayor()"><option value="">— Todas las partidas —</option></select>
-  </div>
-  <div id="mayor-content"></div>
-</div>
-<div class="section" id="sec-diario">
-  <div class="sac"><span class="sec-title">Libro diario — Asientos por fecha</span>
-    <div style="display:flex;gap:8px;align-items:center">
-      <input type="date" id="filtro-fecha" class="flt" onchange="renderDiario()">
-      <button class="btn outline sm" onclick="document.getElementById('filtro-fecha').value='';renderDiario()">Ver todo</button>
+<!-- ══ SECCIÓN REPORTES ══ -->
+<div class="section" id="sec-reportes">
+
+  <!-- Header -->
+  <div style="margin-bottom:20px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px">
+      <div>
+        <h2 style="font-size:20px;font-weight:700;color:var(--teal-dark);margin:0 0 4px">📊 Reportes e Informes Financieros</h2>
+        <p style="font-size:11px;color:var(--text2);margin:0">Estado financiero — Guardería Tía Belly</p>
+      </div>
+      <button class="btn outline sm" onclick="exportarReporte()">💾 Exportar CSV</button>
     </div>
   </div>
-  <div id="diario-content"><div class="empty">Selecciona una fecha o haz clic en "Ver todo"</div></div>
-</div>
 
-<!-- ══ SECCIÓN BALANCE CONTABLE ══ -->
-<div class="section" id="sec-balance">
-  <div class="sac"><span class="sec-title">Balance contable</span><button class="btn" onclick="openBal()">+ Nuevo asiento</button></div>
-
-  <!-- Cards resumen -->
-  <div class="ec-summary" id="bal-cards"></div>
-
-  <!-- Filtros de vista -->
-  <div class="bal-tab">
-    <button id="btab-todos" onclick="setBTab('todos')" class="act-a">📊 Todos</button>
-    <button id="btab-activo" onclick="setBTab('activo')" class="inact">🏦 Activos</button>
-    <button id="btab-pasivo" onclick="setBTab('pasivo')" class="inact">📉 Pasivos</button>
-    <button id="btab-capital" onclick="setBTab('capital')" class="inact">💎 Capital</button>
-    <button id="btab-ingreso" onclick="setBTab('ingreso')" class="inact">📈 Ingresos</button>
-    <button id="btab-egreso" onclick="setBTab('egreso')" class="inact">📤 Egresos</button>
+  <!-- Período de análisis -->
+  <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:20px;box-shadow:var(--shadow)">
+    <div style="font-size:10px;font-weight:700;color:var(--teal-dark);text-transform:uppercase;letter-spacing:.7px;margin-bottom:12px">📅 Período de análisis</div>
+    <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end">
+      <div class="form-group" style="margin:0"><label>Fecha inicio</label><input id="rep-ini" type="date" class="flt"></div>
+      <div class="form-group" style="margin:0"><label>Fecha fin</label><input id="rep-fin" type="date" class="flt"></div>
+      <div class="form-group" style="margin:0"><label>Período rápido</label>
+        <select id="rep-rapido" class="flt" onchange="setRepRapido()">
+          <option value="">Personalizado</option>
+          <option value="hoy">Hoy</option>
+          <option value="sem">Esta semana</option>
+          <option value="mes">Este mes</option>
+          <option value="trim">Este trimestre</option>
+          <option value="year">Este año</option>
+          <option value="todo">Todo el período</option>
+        </select>
+      </div>
+      <button class="btn" onclick="renderReportes()">🔄 Actualizar</button>
+    </div>
   </div>
 
-  <!-- Balance General visual -->
-  <div id="bal-general"></div>
-
-  <!-- Tabla detalle de asientos -->
-  <div class="panel" style="overflow-x:auto;margin-top:14px">
-    <div class="panel-head"><h3 id="bal-tabla-title">📋 Detalle de asientos</h3></div>
-    <table><thead><tr><th>Fecha</th><th>Tipo</th><th>Concepto</th><th>Categoría</th><th>Bs</th><th>USDT</th><th>EUR</th><th>Notas</th><th>Acciones</th></tr></thead>
-    <tbody id="tb-balance"><tr><td colspan="9" class="empty">Sin asientos registrados</td></tr></tbody></table>
+  <!-- Tabla Estado de Resultados estilo Cycle -->
+  <div style="background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:20px;box-shadow:var(--shadow)">
+    <div style="background:var(--teal-dark);padding:12px 18px;display:flex;justify-content:space-between;align-items:center">
+      <span style="color:#fff;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.7px">📋 Estado de Resultados (Ganancias y Pérdidas)</span>
+    </div>
+    <table style="width:100%;border-collapse:collapse">
+      <thead>
+        <tr style="background:#f0f4f8">
+          <th style="text-align:left;padding:10px 18px;font-size:11px;font-weight:700;color:#1a3a5c;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid var(--border)">Concepto</th>
+          <th style="text-align:right;padding:10px 18px;font-size:11px;font-weight:700;color:#1a3a5c;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid var(--border)">Bolívares (Bs.)</th>
+          <th style="text-align:right;padding:10px 18px;font-size:11px;font-weight:700;color:#1a3a5c;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid var(--border)">USDT</th>
+          <th style="text-align:right;padding:10px 18px;font-size:11px;font-weight:700;color:#1a3a5c;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid var(--border)">EUR</th>
+        </tr>
+      </thead>
+      <tbody id="tb-rep-resultados"></tbody>
+    </table>
   </div>
+
+  <!-- Resumen ejecutivo cards -->
+  <div id="rep-resumen" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px"></div>
+
 </div>
 </div>
 </div>
@@ -340,13 +352,36 @@ tr:hover td{background:var(--teal-light)}
         <div class="form-group"><label>Partida contable</label><select id="i-partida"><option value="">— Seleccionar —</option></select></div>
       </div>
       <div class="conv-box">
-        <div class="conv-title">💱 Monto recibido</div>
-        <div class="conv-grid">
-          <div class="conv-field"><span class="clabel lbs">✅ Bs recibidos *</span><input class="ibs" id="i-bs" type="number" placeholder="0.00" oninput="cd('i','bs')"></div>
-          <div class="conv-field"><span class="clabel lusdt">= Equiv. USDT</span><input class="iusdt" id="i-usdt" type="number" placeholder="auto" oninput="cd('i','usdt')"></div>
-          <div class="conv-field"><span class="clabel leur">= Equiv. EUR</span><input class="ieur" id="i-eur" type="number" placeholder="auto" oninput="cd('i','eur')"></div>
+        <div class="conv-title">💱 Flujo de cobro — Pactado en EUR, cobrado en Bs, resguardado en USDT</div>
+        <!-- Paso 1: EUR (base) -->
+        <div style="margin-bottom:10px">
+          <div style="font-size:10px;font-weight:700;color:var(--euro);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">① Tarifa pactada en EUR ★</div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <input class="ieur" id="i-eur" type="number" placeholder="Ej: 10.00" step="0.01"
+              style="flex:1;font-size:15px;font-weight:700;border:2px solid var(--euro)"
+              oninput="iCalcEur()">
+            <span style="font-size:11px;color:var(--text2);flex-shrink:0">€ × tasa EUR (<span id="i-tasa-eur-show">—</span> Bs/€)</span>
+          </div>
         </div>
-        <div class="conv-hint" id="hi">Ingresa los Bs recibidos → se calculan USDT y EUR automáticamente.</div>
+        <!-- Paso 2: Bs cobrados -->
+        <div style="margin-bottom:10px">
+          <div style="font-size:10px;font-weight:700;color:var(--teal-dark);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">② Bs a cobrar al cliente</div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <input class="ibs" id="i-bs" type="number" placeholder="auto" step="0.01"
+              style="flex:1;font-size:15px;font-weight:700;border:2px solid var(--teal)"
+              oninput="iCalcBs()">
+            <span style="font-size:11px;color:var(--text2);flex-shrink:0">Bs ÷ tasa USDT (<span id="i-tasa-usdt-show">—</span> Bs/$)</span>
+          </div>
+        </div>
+        <!-- Paso 3: USDT resultado -->
+        <div style="background:#e0f5f3;border-radius:10px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-size:10px;font-weight:700;color:#065f46;text-transform:uppercase;letter-spacing:.5px">③ Equivalente en USDT (se guarda)</div>
+            <div style="font-size:20px;font-weight:700;color:#065f46;margin-top:3px" id="i-usdt-display">0.00 $</div>
+          </div>
+          <input type="hidden" id="i-usdt">
+        </div>
+        <div class="conv-hint" id="hi" style="margin-top:8px">💡 Ingresa la tarifa en EUR → calcula Bs automático → convierte a USDT para resguardar el valor.</div>
       </div>
       <div class="form-row">
         <div class="form-group"><label>Método de pago</label><select id="i-metodo"><option>Pago Móvil</option><option>Transferencia Bs</option><option>Efectivo Bs</option><option>Zelle</option><option>USDT directo</option><option>Transferencia EUR</option></select></div>
@@ -572,6 +607,17 @@ async function loadAll(){
 
     // Partidas
     pts=await fbGetAll('partidas');
+    // Normalizar tipos legacy (por si tienen emoji o texto diferente)
+    const normTipo=t=>{
+      if(!t)return'Ingreso';
+      if(/ingreso/i.test(t))return'Ingreso';
+      if(/egreso/i.test(t))return'Egreso';
+      if(/activo/i.test(t))return'Activo';
+      if(/pasivo/i.test(t))return'Pasivo';
+      if(/capital/i.test(t))return'Capital';
+      return t;
+    };
+    pts=pts.map(p=>({...p,t:normTipo(p.t)}));
     if(!pts.length){
       for(const p of PTS_DEFAULT){const id=await fbAdd('partidas',p);pts.push({...p,_id:id});}
     }
@@ -612,6 +658,7 @@ function uh(){
   const ok=tU&&tE;
   const h=ok?`Tasas activas — USDT: ${tU} Bs/$ · EUR: ${tE} Bs/€`:'⚠ Ingresa las tasas del día antes de registrar';
   ['hn','hi','he','hp'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=h;});
+  iSyncTasas();
 }
 
 // ── CONVERSIÓN ──
@@ -670,36 +717,75 @@ async function delN(id){
 }
 window.delN=delN;
 
-// ── INGRESOS ──
+// ── FLUJO INGRESO: EUR → Bs → USDT ──
+function iSyncTasas(){
+  const se=document.getElementById('i-tasa-eur-show');
+  const su=document.getElementById('i-tasa-usdt-show');
+  if(se)se.textContent=tE||'—';
+  if(su)su.textContent=tU||'—';
+}
+function iCalcEur(){
+  const eur=parseFloat(document.getElementById('i-eur').value)||0;
+  // EUR × tasa EUR = Bs
+  const bs=tE?parseFloat((eur*tE).toFixed(2)):0;
+  document.getElementById('i-bs').value=bs||'';
+  iCalcUsdt(bs);
+}
+function iCalcBs(){
+  const bs=parseFloat(document.getElementById('i-bs').value)||0;
+  // Si cambian Bs manualmente, recalcular EUR desde Bs
+  const eur=tE?parseFloat((bs/tE).toFixed(4)):0;
+  document.getElementById('i-eur').value=eur||'';
+  iCalcUsdt(bs);
+}
+function iCalcUsdt(bs){
+  const usdt=tU?parseFloat((bs/tU).toFixed(4)):0;
+  document.getElementById('i-usdt').value=usdt||0;
+  const disp=document.getElementById('i-usdt-display');
+  if(disp)disp.textContent=fU(usdt);
+}
+window.iCalcEur=iCalcEur;
+window.iCalcBs=iCalcBs;
 function openI(id=null){
   document.getElementById('mi-t').textContent=id?'Editar ingreso':'Registrar ingreso';
   document.getElementById('i-id').value=id||'';
   const sel=document.getElementById('i-nino');
   sel.innerHTML='<option value="">— General —</option>'+ninos.map(n=>`<option value="${n._id}">${n.nombre}</option>`).join('');
   document.getElementById('i-partida').innerHTML='<option value="">— Seleccionar —</option>'+gPO('Ingreso');
+  iSyncTasas();
   if(id){
     const r=ing.find(x=>x._id===id);
     document.getElementById('i-fecha').value=r.fecha||hoy();
     document.getElementById('i-nino').value=r.niId||'';
     document.getElementById('i-partida').value=r.pt||'';
-    scv('i',{bs:r.bs||0,usdt:r.usdt||0,eur:r.eur||0});
+    document.getElementById('i-eur').value=r.eur||'';
+    document.getElementById('i-bs').value=r.bs||'';
+    document.getElementById('i-usdt').value=r.usdt||0;
+    const disp=document.getElementById('i-usdt-display');
+    if(disp)disp.textContent=fU(r.usdt||0);
     document.getElementById('i-metodo').value=r.met||'Pago Móvil';
     document.getElementById('i-ref').value=r.ref||'';
     document.getElementById('i-desc').value=r.desc||'';
   } else {
     document.getElementById('i-fecha').value=hoy();
     ['i-ref','i-desc'].forEach(x=>document.getElementById(x).value='');
-    clcv('i');
+    document.getElementById('i-eur').value='';
+    document.getElementById('i-bs').value='';
+    document.getElementById('i-usdt').value=0;
+    const disp=document.getElementById('i-usdt-display');
+    if(disp)disp.textContent='0.00 $';
   }
   om('modal-i');
 }
 window.openI=openI;
 async function gI(){
-  const cv=gcv('i');
-  if(!cv.bs&&!cv.usdt&&!cv.eur){alert('Ingresa el monto recibido');return;}
+  const eur=parseFloat(document.getElementById('i-eur').value)||0;
+  const bs=parseFloat(document.getElementById('i-bs').value)||0;
+  const usdt=parseFloat(document.getElementById('i-usdt').value)||0;
+  if(!eur&&!bs){alert('Ingresa la tarifa en EUR o los Bs recibidos');return;}
   const niId=document.getElementById('i-nino').value;
   const niNombre=niId?ninos.find(x=>x._id===niId)?.nombre||'General':'General';
-  const obj={fecha:document.getElementById('i-fecha').value||hoy(),nino:niNombre,niId,pt:document.getElementById('i-partida').value,tU,tE,bs:cv.bs,usdt:cv.usdt,eur:cv.eur,met:document.getElementById('i-metodo').value,ref:document.getElementById('i-ref').value,desc:document.getElementById('i-desc').value};
+  const obj={fecha:document.getElementById('i-fecha').value||hoy(),nino:niNombre,niId,pt:document.getElementById('i-partida').value,tU,tE,bs,usdt,eur,met:document.getElementById('i-metodo').value,ref:document.getElementById('i-ref').value,desc:document.getElementById('i-desc').value};
   const id=document.getElementById('i-id').value;
   setSave('Guardando...');
   try{
@@ -900,6 +986,12 @@ function rPartidas(){
     {k:'Ingreso',  emoji:'📈', color:'var(--teal)',     movCol:ing},
     {k:'Egreso',   emoji:'📤', color:'var(--orange)',   movCol:egr},
   ];
+  const tiposConocidos=TIPOS.map(t=>t.k);
+  // Partidas con tipo no reconocido (legacy) → tratarlas como Ingreso
+  const legacy=pts.filter(p=>!tiposConocidos.includes(p.t));
+  if(legacy.length){
+    legacy.forEach(p=>{ p._tOrig=p.t; p.t='Ingreso'; });
+  }
   let html='';
   TIPOS.forEach(({k,emoji,color,movCol})=>{
     const lista=pts.filter(p=>p.t===k);
@@ -939,59 +1031,247 @@ function rPartidas(){
   });
   document.getElementById('lista-partidas').innerHTML=html||'<div class="empty">Sin partidas registradas</div>';
 }
-function renderMayor(){
-  const sel=document.getElementById('filtro-mayor');
-  const filtro=sel.value;
-  sel.innerHTML='<option value="">— Todas las partidas —</option>'+pts.map(p=>`<option value="${p.c}">${p.c} · ${p.n}</option>`).join('');
-  sel.value=filtro;
-  const lista=filtro?pts.filter(p=>p.c===filtro):pts;
-  let html='';
-  lista.forEach(p=>{
-    const movs=(p.t==='Ingreso'?ing:egr).filter(r=>r.pt===p.c);
-    if(!movs.length&&!filtro&&!(p.sU||p.sBs||p.sE))return;
-    const tUp=movs.reduce((s,r)=>s+(r.usdt||0),0);
-    const tEp=movs.reduce((s,r)=>s+(r.eur||0),0);
-    const tBsp=movs.reduce((s,r)=>s+(r.bs||0),0);
-    const sBs=p.sBs||0, sU=p.sU||0, sE=p.sE||0;
-    const totalU=tUp+sU, totalE=tEp+sE, totalBs=tBsp+sBs;
-    html+=`<div class="pcard" style="margin-bottom:14px"><div class="p-head" style="background:${p.t==='Ingreso'?'var(--teal-dark)':'var(--orange)'}"><div><h4>${p.c} · ${p.n}</h4><div style="font-size:10px;color:rgba(255,255,255,.7)">${p.t} · ${movs.length} movimientos${sU?` · Saldo inicial: ${fU(sU)}`:''}</div></div><div style="text-align:right"><div style="font-size:13px;font-weight:700;color:#fff">${fU(totalU)}</div>${totalE?`<div style="font-size:10px;color:rgba(255,255,255,.8)">${fE(totalE)}</div>`:''}<div style="font-size:9px;color:rgba(255,255,255,.6)">${fBs(totalBs)}</div></div></div>`;
-    if(sU||sBs||sE){
-      html+=`<div style="display:flex;gap:18px;align-items:center;padding:7px 15px;border-bottom:1px solid var(--border);background:#f9fafb;font-size:10px;color:var(--text2)"><span style="font-weight:700">📌 Saldo inicial:</span>${sU?`<span style="color:#059669;font-weight:700">+${fU(sU)}</span>`:''} ${sE?`<span style="color:var(--euro);font-weight:700">+${fE(sE)}</span>`:''} ${sBs?`<span style="color:var(--teal-dark);font-weight:700">+${fBs(sBs)}</span>`:''}</div>`;
-    }
-    if(!movs.length){html+='<div class="empty" style="padding:14px">Sin movimientos en esta partida</div>';}
-    const esI=p.t==='Ingreso';
-    movs.sort((a,b)=>a.fecha.localeCompare(b.fecha)).forEach(r=>{
-      html+=`<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:8px 15px;border-bottom:1px solid var(--border);font-size:11px;gap:10px"><div style="flex:1"><strong>${fd(r.fecha)}</strong> — ${esI?r.nino:(r.conc||r.tipo)}${esI&&r.per?' · '+r.per:''}${!esI&&r.benef?' · '+r.benef:''}<div style="font-size:9px;color:var(--text3);margin-top:2px;font-style:italic">Tasa USDT: ${r.tU||'—'} Bs/$ · EUR: ${r.tE||'—'} Bs/€${r.ref?' · Ref: '+r.ref:''}${r.desc?' · '+r.desc.substring(0,40):''}</div></div><div style="text-align:right;flex-shrink:0"><span class="${esI?'pos':'neg'}">${esI?'+':'-'}${fU(r.usdt)}</span><div style="font-size:9px;color:var(--text3)">${esI?'+':'-'}${fBs(r.bs)}</div>${r.eur?`<div style="font-size:9px;color:var(--euro)">${esI?'+':'-'}${fE(r.eur)}</div>`:''}</div></div>`;
-    });
-    html+=`<div style="display:flex;justify-content:space-between;padding:9px 15px;background:var(--teal-light);font-size:12px;font-weight:700;color:var(--teal-dark)"><span>Saldo total${sU?' (con saldo inicial)':''}</span><div style="text-align:right"><div>${fU(totalU)}</div>${totalE?`<div style="font-size:10px;color:var(--euro)">${fE(totalE)}</div>`:''}<div style="font-size:9px;color:var(--text2)">${fBs(totalBs)}</div></div></div></div>`;
-  });
-  document.getElementById('mayor-content').innerHTML=html||'<div class="empty">Sin movimientos registrados aún.</div>';
+// ══════════════════════════════════════════════
+// ── MÓDULO REPORTES ──
+// ══════════════════════════════════════════════
+function setRepRapido(){
+  const v=document.getElementById('rep-rapido').value;
+  const hoyS=hoy();
+  const d=new Date();
+  let ini='',fin=hoyS;
+  if(v==='hoy'){ini=hoyS;}
+  else if(v==='sem'){const day=d.getDay()||7;d.setDate(d.getDate()-day+1);ini=d.toISOString().slice(0,10);}
+  else if(v==='mes'){ini=hoyS.slice(0,7)+'-01';}
+  else if(v==='trim'){const q=Math.floor(d.getMonth()/3);ini=d.getFullYear()+'-'+String(q*3+1).padStart(2,'0')+'-01';}
+  else if(v==='year'){ini=d.getFullYear()+'-01-01';}
+  else if(v==='todo'){ini='';fin='';}
+  document.getElementById('rep-ini').value=ini;
+  document.getElementById('rep-fin').value=fin;
+  if(v)renderReportes();
 }
-window.renderMayor=renderMayor;
-function renderDiario(){
-  const filtro=document.getElementById('filtro-fecha').value;
-  const todos=[...ing.filter(r=>!filtro||r.fecha===filtro).map(r=>({...r,_t:'I'})),...egr.filter(r=>!filtro||r.fecha===filtro).map(r=>({...r,_t:'E'}))].sort((a,b)=>a.fecha.localeCompare(b.fecha));
-  if(!todos.length){document.getElementById('diario-content').innerHTML=`<div class="empty">Sin movimientos${filtro?' para '+fd(filtro):'. Registra ingresos o egresos'}.</div>`;return;}
-  const pF={};todos.forEach(t=>{if(!pF[t.fecha])pF[t.fecha]=[];pF[t.fecha].push(t)});
-  let html='',tiU=0,teU=0,tiE=0,teE=0,tiBs=0,teBs=0;
-  Object.keys(pF).sort().forEach(fecha=>{
-    let dIU=0,dEU=0,dIE=0,dEE=0,dIBs=0,dEBs=0;
-    pF[fecha].forEach(t=>{if(t._t==='I'){dIU+=(t.usdt||0);dIE+=(t.eur||0);dIBs+=(t.bs||0);}else{dEU+=(t.usdt||0);dEE+=(t.eur||0);dEBs+=(t.bs||0);}});
-    tiU+=dIU;teU+=dEU;tiE+=dIE;teE+=dEE;tiBs+=dIBs;teBs+=dEBs;
-    html+=`<div class="asiento"><div class="a-head"><span>📅 ${fd(fecha)}</span><span style="font-size:10px;opacity:.8">${pF[fecha].length} asiento${pF[fecha].length!==1?'s':''} · Neto: ${fU(dIU-dEU)}</span></div>`;
-    pF[fecha].forEach(t=>{
-      const pN=t.pt?gNP(t.pt):'Sin partida';
-      if(t._t==='I'){html+=`<div class="a-line"><div style="flex:1"><strong>${t.nino}</strong> — ${pN}${t.per?' · '+t.per:''}<div class="a-desc">Método: ${t.met} · USDT: ${t.tU||'—'} Bs/$ · EUR: ${t.tE||'—'} Bs/€${t.ref?' · Ref: '+t.ref:''}${t.desc?' · '+t.desc:''}</div></div><div style="text-align:right;flex-shrink:0;margin-left:10px"><span class="pos">+${fU(t.usdt)}</span><div style="font-size:10px;color:var(--teal)">+${fBs(t.bs)}</div>${t.eur?`<div style="font-size:10px;color:var(--euro)">+${fE(t.eur)}</div>`:''}</div></div>`;}
-      else{html+=`<div class="a-line"><div style="flex:1"><strong>${t.conc||t.tipo}</strong>${t.benef?' — '+t.benef:''} · ${pN}<div class="a-desc">USDT: ${t.tU||'—'} Bs/$ · EUR: ${t.tE||'—'} Bs/€${t.ref?' · Ref: '+t.ref:''}${t.desc?' · '+t.desc:''}</div></div><div style="text-align:right;flex-shrink:0;margin-left:10px"><span class="neg">-${fU(t.usdt)}</span><div style="font-size:10px;color:var(--red)">-${fBs(t.bs)}</div>${t.eur?`<div style="font-size:10px;color:var(--euro)">-${fE(t.eur)}</div>`:''}</div></div>`;}
-    });
-    html+=`<div class="a-line total"><span>Resultado del día</span><div style="text-align:right"><span class="${dIU-dEU>=0?'pos':'neg'}">${fU(dIU-dEU)}</span><div style="font-size:10px;color:var(--text2)">${fBs(dIBs-dEBs)}</div>${dIE||dEE?`<div style="font-size:10px;color:var(--euro)">${fE(dIE-dEE)}</div>`:''}</div></div></div>`;
-  });
-  if(!filtro){html+=`<div class="asiento" style="margin-top:16px"><div class="a-head"><span>📊 Resumen total</span></div><div class="a-line total"><span>Total ingresos (USDT)</span><span class="pos">+${fU(tiU)}</span></div><div class="a-line total"><span>Total egresos (USDT)</span><span class="neg">-${fU(teU)}</span></div><div class="a-line total"><span>Total ingresos (Bs)</span><span style="color:var(--teal);font-weight:700">+${fBs(tiBs)}</span></div><div class="a-line total"><span>Total egresos (Bs)</span><span class="neg">-${fBs(teBs)}</span></div>${tiE||teE?`<div class="a-line total"><span>Total ingresos (EUR)</span><span class="ecol">+${fE(tiE)}</span></div><div class="a-line total"><span>Total egresos (EUR)</span><span class="neg">-${fE(teE)}</span></div>`:''}<div class="a-line total" style="border-top:2px solid var(--teal);font-size:13px"><span>Resultado neto</span><div style="text-align:right"><span class="${tiU-teU>=0?'pos':'neg'}">${fU(tiU-teU)}</span><div style="font-size:10px;color:var(--text2)">${fBs(tiBs-teBs)}</div></div></div></div>`;}
-  document.getElementById('diario-content').innerHTML=html;
-}
-window.renderDiario=renderDiario;
+window.setRepRapido=setRepRapido;
 
-function ra(){rDash();rNinos();rIngresos();rEgresos();rPersonal();rPartidas();renderMayor();renderDiario();renderBalance();}
+function renderReportes(){
+  const ini=document.getElementById('rep-ini').value;
+  const fin=document.getElementById('rep-fin').value;
+  const enRango=r=>(!ini||r.fecha>=ini)&&(!fin||r.fecha<=fin);
+
+  const ingF=ing.filter(enRango);
+  const egrF=egr.filter(enRango);
+
+  const totIngBs=ingF.reduce((s,r)=>s+(r.bs||0),0);
+  const totIngU=ingF.reduce((s,r)=>s+(r.usdt||0),0);
+  const totIngE=ingF.reduce((s,r)=>s+(r.eur||0),0);
+  const totEgrBs=egrF.reduce((s,r)=>s+(r.bs||0),0);
+  const totEgrU=egrF.reduce((s,r)=>s+(r.usdt||0),0);
+  const totEgrE=egrF.reduce((s,r)=>s+(r.eur||0),0);
+
+  // Acumular por partida
+  const ingPorPart={}, egrPorPart={};
+  ingF.forEach(r=>{if(!ingPorPart[r.pt])ingPorPart[r.pt]={bs:0,usdt:0,eur:0};ingPorPart[r.pt].bs+=(r.bs||0);ingPorPart[r.pt].usdt+=(r.usdt||0);ingPorPart[r.pt].eur+=(r.eur||0);});
+  egrF.forEach(r=>{if(!egrPorPart[r.pt])egrPorPart[r.pt]={bs:0,usdt:0,eur:0};egrPorPart[r.pt].bs+=(r.bs||0);egrPorPart[r.pt].usdt+=(r.usdt||0);egrPorPart[r.pt].eur+=(r.eur||0);});
+
+  // Helpers de fila
+  const fSep=(label,color='#1a3a5c')=>`<tr style="background:${color}"><td colspan="4" style="color:#fff;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;padding:9px 18px">${label}</td></tr>`;
+  const fRow=(label,bs,u,e,bold=false,bg='',colorU='')=>{
+    const s=bold?'font-weight:700':'font-size:11px';
+    const cu=colorU||(u>=0?'#1a5276':'#c0392b');
+    return `<tr style="${bg?'background:'+bg:''}border-bottom:1px solid #eef">
+      <td style="padding:9px 18px 9px ${bold?'18':'30'}px;${s};color:#1a3a5c">${label}</td>
+      <td style="text-align:right;padding:9px 18px;${s};color:#2c3e50">${bs?fBs(bs):'0,00 Bs.'}</td>
+      <td style="text-align:right;padding:9px 18px;${s};color:${cu};font-weight:${bold?700:500}">${fU(u)}</td>
+      <td style="text-align:right;padding:9px 18px;${s};color:var(--euro)">${e?fE(e):'0,00 €'}</td>
+    </tr>`;
+  };
+
+  let rows='';
+
+  // ── I. INGRESOS ──
+  rows+=fSep('I. Ingresos operativos','#1a5276');
+  const ingPartidas=pts.filter(p=>p.t==='Ingreso');
+  ingPartidas.forEach(p=>{
+    const d=ingPorPart[p.c]||{bs:0,usdt:0,eur:0};
+    const si={bs:p.sBs||0,usdt:p.sU||0,eur:p.sE||0};
+    const tb=d.bs+si.bs, tu=d.usdt+si.usdt, te=d.eur+si.eur;
+    if(tu||te||tb)rows+=fRow(p.n,tb,tu,te);
+  });
+  const sinPart=ingF.filter(r=>!r.pt);
+  if(sinPart.length){const b=sinPart.reduce((s,r)=>s+(r.bs||0),0),u=sinPart.reduce((s,r)=>s+(r.usdt||0),0),e=sinPart.reduce((s,r)=>s+(r.eur||0),0);rows+=fRow('Otros ingresos',b,u,e);}
+  rows+=fRow('TOTAL INGRESOS',totIngBs,totIngU,totIngE,true,'#ebf5fb','#1a5276');
+
+  // ── II. EGRESOS ──
+  rows+=fSep('II. Egresos operativos','#641e16');
+  const egrPartidas=pts.filter(p=>p.t==='Egreso');
+  egrPartidas.forEach(p=>{
+    const d=egrPorPart[p.c]||{bs:0,usdt:0,eur:0};
+    const si={bs:p.sBs||0,usdt:p.sU||0,eur:p.sE||0};
+    const tb=d.bs+si.bs, tu=d.usdt+si.usdt, te=d.eur+si.eur;
+    if(tu||te||tb)rows+=fRow(p.n,tb,tu,te);
+  });
+  const sinPartE=egrF.filter(r=>!r.pt);
+  if(sinPartE.length){const b=sinPartE.reduce((s,r)=>s+(r.bs||0),0),u=sinPartE.reduce((s,r)=>s+(r.usdt||0),0),e=sinPartE.reduce((s,r)=>s+(r.eur||0),0);rows+=fRow('Otros egresos',b,u,e);}
+  rows+=fRow('TOTAL EGRESOS',totEgrBs,totEgrU,totEgrE,true,'#fdedec','#c0392b');
+
+  // ── RESULTADO ──
+  const netoBs=totIngBs-totEgrBs, netoU=totIngU-totEgrU, netoE=totIngE-totEgrE;
+  rows+=fSep(netoU>=0?'✅ Resultado del período — UTILIDAD':'❌ Resultado del período — PÉRDIDA', netoU>=0?'#1e8449':'#c0392b');
+  rows+=`<tr style="background:${netoU>=0?'#eafaf1':'#fdedec'}">
+    <td style="padding:12px 18px;font-weight:700;font-size:13px;color:${netoU>=0?'#1e8449':'#c0392b'}">${netoU>=0?'UTILIDAD NETA':'PÉRDIDA NETA'}</td>
+    <td style="text-align:right;padding:12px 18px;font-weight:700;font-size:13px;color:#2c3e50">${fBs(netoBs)}</td>
+    <td style="text-align:right;padding:12px 18px;font-weight:700;font-size:15px;color:${netoU>=0?'#1e8449':'#c0392b'}">${fU(netoU)}</td>
+    <td style="text-align:right;padding:12px 18px;font-weight:700;font-size:13px;color:var(--euro)">${fE(netoE)}</td>
+  </tr>`;
+
+  document.getElementById('tb-rep-resultados').innerHTML=rows;
+
+  // ── Cards resumen ──
+  const cards=[
+    {label:'💰 Total Ingresos',val:fU(totIngU),sub:fBs(totIngBs),eur:fE(totIngE),color:'#1a5276',bg:'#ebf5fb',border:'#2980b9'},
+    {label:'📤 Total Egresos',val:fU(totEgrU),sub:fBs(totEgrBs),eur:fE(totEgrE),color:'#c0392b',bg:'#fdedec',border:'#e74c3c'},
+    {label:'📊 Resultado Neto',val:fU(netoU),sub:fBs(netoBs),eur:fE(netoE),color:netoU>=0?'#1e8449':'#c0392b',bg:netoU>=0?'#eafaf1':'#fdedec',border:netoU>=0?'#27ae60':'#e74c3c'},
+    {label:'📋 Movimientos',val:String(ingF.length+egrF.length),sub:`${ingF.length} ingresos · ${egrF.length} egresos`,eur:'',color:'#6c3483',bg:'#f5eef8',border:'#8e44ad'},
+  ];
+  document.getElementById('rep-resumen').innerHTML=cards.map(c=>`
+    <div style="background:${c.bg};border:2px solid ${c.border};border-radius:14px;padding:14px 16px">
+      <div style="font-size:10px;font-weight:700;color:${c.color};margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">${c.label}</div>
+      <div style="font-size:20px;font-weight:700;color:${c.color}">${c.val}</div>
+      <div style="font-size:10px;color:${c.color};opacity:.75;margin-top:3px">${c.sub}</div>
+      ${c.eur?`<div style="font-size:10px;color:var(--euro);margin-top:2px;font-weight:600">${c.eur}</div>`:''}
+    </div>`).join('');
+}
+window.renderReportes=renderReportes;
+
+function exportarReporte(){
+  const ini=document.getElementById('rep-ini').value;
+  const fin=document.getElementById('rep-fin').value;
+  const enRango=r=>(!ini||r.fecha>=ini)&&(!fin||r.fecha<=fin);
+  const ingF=ing.filter(enRango), egrF=egr.filter(enRango);
+  let csv='Tipo,Fecha,Concepto,Partida,Bs,USDT,EUR\n';
+  ingF.forEach(r=>csv+=`Ingreso,${r.fecha},${r.nino||''},${gNP(r.pt)},${r.bs||0},${r.usdt||0},${r.eur||0}\n`);
+  egrF.forEach(r=>csv+=`Egreso,${r.fecha},${r.conc||r.tipo||''},${gNP(r.pt)},${r.bs||0},${r.usdt||0},${r.eur||0}\n`);
+  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download=`reporte_${ini||'todo'}_${fin||'todo'}.csv`;a.click();
+}
+window.exportarReporte=exportarReporte;
+function setRepRapido(){
+  const v=document.getElementById('rep-rapido').value;
+  const hoyS=hoy();
+  const d=new Date();
+  let ini='',fin=hoyS;
+  if(v==='hoy'){ini=hoyS;}
+  else if(v==='sem'){const day=d.getDay()||7;d.setDate(d.getDate()-day+1);ini=d.toISOString().slice(0,10);}
+  else if(v==='mes'){ini=hoyS.slice(0,7)+'-01';}
+  else if(v==='trim'){const q=Math.floor(d.getMonth()/3);ini=d.getFullYear()+'-'+String(q*3+1).padStart(2,'0')+'-01';}
+  else if(v==='year'){ini=d.getFullYear()+'-01-01';}
+  else if(v==='todo'){ini='';fin='';}
+  document.getElementById('rep-ini').value=ini;
+  document.getElementById('rep-fin').value=fin;
+  if(v)renderReportes();
+}
+window.setRepRapido=setRepRapido;
+
+function renderReportes(){
+  const ini=document.getElementById('rep-ini').value;
+  const fin=document.getElementById('rep-fin').value;
+  const enRango=r=>(!ini||r.fecha>=ini)&&(!fin||r.fecha<=fin);
+
+  const ingF=ing.filter(enRango);
+  const egrF=egr.filter(enRango);
+
+  // Totales ingresos
+  const totIngBs=ingF.reduce((s,r)=>s+(r.bs||0),0);
+  const totIngU=ingF.reduce((s,r)=>s+(r.usdt||0),0);
+  // Totales egresos
+  const totEgrBs=egrF.reduce((s,r)=>s+(r.bs||0),0);
+  const totEgrU=egrF.reduce((s,r)=>s+(r.usdt||0),0);
+  // Por partida
+  const ingPorPart={}, egrPorPart={};
+  ingF.forEach(r=>{if(!ingPorPart[r.pt])ingPorPart[r.pt]={bs:0,usdt:0};ingPorPart[r.pt].bs+=(r.bs||0);ingPorPart[r.pt].usdt+=(r.usdt||0);});
+  egrF.forEach(r=>{if(!egrPorPart[r.pt])egrPorPart[r.pt]={bs:0,usdt:0};egrPorPart[r.pt].bs+=(r.bs||0);egrPorPart[r.pt].usdt+=(r.usdt||0);});
+
+  // ── Estado de Resultados ──
+  const tbR=document.getElementById('tb-rep-resultados').querySelector('tbody');
+  let rowsR='';
+  const fRow=(label,bs,u,cls='',indent=false)=>`<tr${cls?` style="background:${cls}"`:''}><td style="text-align:left;${indent?'padding-left:28px;font-size:11px;color:var(--text2)':'font-weight:700'}">${label}</td><td>${fBs(bs)}</td><td style="font-weight:${indent?'400':'700'};color:${u>=0?'var(--teal-dark)':'var(--red)'}">${fU(u)}</td></tr>`;
+  const fSep=(label)=>`<tr style="background:#1a3a5c"><td colspan="3" style="color:#fff;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;padding:8px 16px">${label}</td></tr>`;
+
+  // I. Ingresos
+  rowsR+=fSep('I. Ingresos operativos');
+  const ingPartidas=pts.filter(p=>p.t==='Ingreso');
+  ingPartidas.forEach(p=>{
+    const d=ingPorPart[p.c]||{bs:0,usdt:0};
+    const si=p.sU||0, siBs=p.sBs||0;
+    if(d.usdt||si)rowsR+=fRow(`${p.n}`,d.bs+siBs,d.usdt+si,'',true);
+  });
+  // Ingresos sin partida
+  const sinPart=ingF.filter(r=>!r.pt);
+  if(sinPart.length){const bs=sinPart.reduce((s,r)=>s+(r.bs||0),0),u=sinPart.reduce((s,r)=>s+(r.usdt||0),0);rowsR+=fRow('Otros ingresos',bs,u,'',true);}
+  rowsR+=fRow('TOTAL INGRESOS',totIngBs,totIngU,'#e0f5f3');
+
+  // II. Egresos
+  rowsR+=fSep('II. Egresos operativos');
+  const egrPartidas=pts.filter(p=>p.t==='Egreso');
+  egrPartidas.forEach(p=>{
+    const d=egrPorPart[p.c]||{bs:0,usdt:0};
+    const si=p.sU||0, siBs=p.sBs||0;
+    if(d.usdt||si)rowsR+=fRow(`${p.n}`,d.bs+siBs,d.usdt+si,'',true);
+  });
+  const sinPartE=egrF.filter(r=>!r.pt);
+  if(sinPartE.length){const bs=sinPartE.reduce((s,r)=>s+(r.bs||0),0),u=sinPartE.reduce((s,r)=>s+(r.usdt||0),0);rowsR+=fRow('Otros egresos',bs,u,'',true);}
+  rowsR+=fRow('TOTAL EGRESOS',totEgrBs,totEgrU,'#fdecea');
+
+  // Resultado
+  const netoBs=totIngBs-totEgrBs, netoU=totIngU-totEgrU;
+  rowsR+=fSep('Resultado del período');
+  rowsR+=`<tr style="background:${netoU>=0?'#e0f5f3':'#fdecea'}"><td style="text-align:left;font-weight:700;font-size:13px">${netoU>=0?'✅ UTILIDAD NETA':'❌ PÉRDIDA NETA'}</td><td style="font-weight:700">${fBs(netoBs)}</td><td style="font-weight:700;font-size:13px;color:${netoU>=0?'#065f46':'var(--red)'}">${fU(netoU)}</td></tr>`;
+  tbR.innerHTML=rowsR;
+
+  // ── Balance General ──
+  const tbB=document.getElementById('tb-rep-balance').querySelector('tbody');
+  let rowsB='';
+  const balTipos=['Activo','Pasivo','Capital'];
+  balTipos.forEach(tipo=>{
+    const lista=pts.filter(p=>p.t===tipo);
+    if(!lista.length)return;
+    const emoji={Activo:'🏦',Pasivo:'📉',Capital:'💎'}[tipo];
+    rowsB+=fSep(`${emoji} ${tipo}s`);
+    let totBs=0,totU=0;
+    lista.forEach(p=>{
+      totBs+=(p.sBs||0);totU+=(p.sU||0);
+      if(p.sU||p.sBs)rowsB+=fRow(p.n,p.sBs||0,p.sU||0,'',true);
+    });
+    // Sumar movimientos del balance contable
+    balAsientos.filter(a=>a.tipo.toLowerCase()===tipo.toLowerCase()).forEach(a=>{totBs+=(a.bs||0);totU+=(a.usdt||0);rowsB+=fRow(a.conc,a.bs||0,a.usdt||0,'',true);});
+    rowsB+=fRow(`TOTAL ${tipo.toUpperCase()}S`,totBs,totU,'#f0f4ff');
+  });
+  // Agregar resultado al balance
+  rowsB+=fSep('Resultado del período');
+  rowsB+=fRow('Utilidad / Pérdida',netoBs,netoU,netoU>=0?'#e0f5f3':'#fdecea');
+  tbB.innerHTML=rowsB;
+
+  // ── Resumen ejecutivo ──
+  const cards=[
+    {label:'💰 Total Ingresos',val:fU(totIngU),sub:fBs(totIngBs),color:'#0d9488',bg:'#e0f5f3'},
+    {label:'📤 Total Egresos',val:fU(totEgrU),sub:fBs(totEgrBs),color:'#e53935',bg:'#fdecea'},
+    {label:'📊 Resultado Neto',val:fU(netoU),sub:fBs(netoBs),color:netoU>=0?'#059669':'#e53935',bg:netoU>=0?'#d1fae5':'#fdecea'},
+    {label:'📋 Movimientos',val:ingF.length+egrF.length,sub:`${ingF.length} ing · ${egrF.length} egr`,color:'#7c3aed',bg:'#ede9fe'},
+  ];
+  document.getElementById('rep-resumen').innerHTML=cards.map(c=>`<div style="background:${c.bg};border:2px solid ${c.color};border-radius:12px;padding:14px 16px"><div style="font-size:10px;font-weight:700;color:${c.color};margin-bottom:6px">${c.label}</div><div style="font-size:18px;font-weight:700;color:${c.color}">${c.val}</div><div style="font-size:10px;color:${c.color};opacity:.7;margin-top:2px">${c.sub}</div></div>`).join('');
+}
+window.renderReportes=renderReportes;
+
+function exportarReporte(){
+  const ini=document.getElementById('rep-ini').value;
+  const fin=document.getElementById('rep-fin').value;
+  const enRango=r=>(!ini||r.fecha>=ini)&&(!fin||r.fecha<=fin);
+  const ingF=ing.filter(enRango), egrF=egr.filter(enRango);
+  let csv='Tipo,Fecha,Concepto,Partida,Bs,USDT,EUR\n';
+  ingF.forEach(r=>csv+=`Ingreso,${r.fecha},${r.nino||''},${gNP(r.pt)},${r.bs||0},${r.usdt||0},${r.eur||0}\n`);
+  egrF.forEach(r=>csv+=`Egreso,${r.fecha},${r.conc||r.tipo||''},${gNP(r.pt)},${r.bs||0},${r.usdt||0},${r.eur||0}\n`);
+  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download=`reporte_${ini||'todo'}_${fin||'todo'}.csv`;a.click();
+}
+window.exportarReporte=exportarReporte;
+
+function ra(){rDash();rNinos();rIngresos();rEgresos();rPersonal();rPartidas();renderReportes();}
 
 // ══════════════════════════════════════════════
 // ── MÓDULO BALANCE CONTABLE ──
