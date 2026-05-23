@@ -428,7 +428,7 @@ tr:hover td{background:var(--teal-light)}
       <input type="hidden" id="pa-id">
       <div class="form-row">
         <div class="form-group"><label>Código *</label><input id="pa-cod" type="text" placeholder="Ej: 115"></div>
-        <div class="form-group"><label>Tipo *</label><select id="pa-tipo"><option value="Ingreso">📈 Ingreso</option><option value="Egreso">📤 Egreso</option><option value="Activo">🏦 Activo — Caja, cuentas por cobrar, equipos</option><option value="Pasivo">📉 Pasivo — Deudas, préstamos, cuentas por pagar</option><option value="Capital">💎 Capital — Aportes del dueño, reservas</option></select></div>
+        <div class="form-group"><label>Tipo *</label><select id="pa-tipo"><option value="Activo">🏦 Activo — Caja, cuentas por cobrar, equipos</option><option value="Pasivo">📉 Pasivo — Deudas, préstamos, cuentas por pagar</option><option value="Capital">💎 Capital — Aportes del dueño, reservas</option><option value="Ingreso">📈 Ingreso</option><option value="Egreso">📤 Egreso</option></select></div>
       </div>
       <div class="form-row single"><div class="form-group"><label>Nombre de la partida *</label><input id="pa-nombre" type="text" placeholder="Ej: Ingresos por matrícula"></div></div>
       <div class="form-row single"><div class="form-group"><label>Descripción</label><textarea id="pa-desc" placeholder="Qué movimientos se registran aquí..."></textarea></div></div>
@@ -896,11 +896,11 @@ function rPersonal(){
 }
 function rPartidas(){
   const TIPOS=[
-    {k:'Ingreso',  emoji:'📈', color:'var(--teal)',     movCol:ing},
-    {k:'Egreso',   emoji:'📤', color:'var(--orange)',   movCol:egr},
     {k:'Activo',   emoji:'🏦', color:'#0d9488',         movCol:[]},
     {k:'Pasivo',   emoji:'📉', color:'#e53935',         movCol:[]},
     {k:'Capital',  emoji:'💎', color:'#7c3aed',         movCol:[]},
+    {k:'Ingreso',  emoji:'📈', color:'var(--teal)',     movCol:ing},
+    {k:'Egreso',   emoji:'📤', color:'var(--orange)',   movCol:egr},
   ];
   let html='';
   TIPOS.forEach(({k,emoji,color,movCol})=>{
